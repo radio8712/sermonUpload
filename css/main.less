@@ -1,16 +1,134 @@
 /****************************************
 *	Page
 ****************************************/
+@border: #ccc;
+@width: 540px;
+@short-select: 152px;
+@short-input: 382px;
 
 body {
 	background-image: url("../images/Background.png");
 	background-repeat: repeat-x;
 }
 
+.clear {
+	clear: both;
+	margin: 5px 0;
+	&.extra {
+		margin: 12px 0 5px 0;
+	}
+}
+
 .form {
 	background: white;
 	margin: 50px auto 0 auto;
 	width: 700px;
+	label {
+		width: 150px;
+		height: 25px;
+		line-height: 25px;
+		font-size: 20px;
+		display: inline-block;
+	}
+	input {
+		&[type="text"] {
+			position: relative;
+			top: -1px;
+			width: @width - 10;
+			height: 25px;
+			line-height: 25px;
+			font-size: 15px;
+			padding: 0 5px;
+			border-radius: 5px;
+			border: solid 1px @border;
+		}
+		&:focus {
+			outline: none;
+			background: rgb(244, 245, 247);
+		}
+		&.short {
+			width: @short-input - 10;
+		}
+		&[type='file'] {
+			display: none;
+		}
+	}
+
+	.select {
+		position: relative;
+		top: 7px;
+		display: inline-block;
+		width: @width;
+		height: 25px;
+		line-height: 25px;
+		border-radius: 5px;
+		border: solid 1px @border;
+		.fa{
+			float: right;
+			color: #aaa;
+			margin: -25px 2px 2px 0;
+			line-height: 25px;
+		}
+		select {
+			width: @width;
+			height: 25px;
+			line-height: 25px;
+			padding: 0 5px;
+			font-size: 15px;
+/* 			font-size: 16px; */
+			background: transparent;
+			outline: none;
+			border: 0;
+			border-radius: 0;
+			-webkit-appearance: none;
+		}
+		&.short {
+			width: @short-select;
+			select {
+				width: @short-select;
+			}
+		}
+		&.book {
+			width: 230px;
+			select {
+				width: 230px;
+			}
+		}
+		&.number {
+			width: 65px;
+			select {
+				width: 65px;
+			}
+		}
+	}
+}
+@background: rgb(246, 246, 246);
+@background-hover: rgb(0, 115, 234);
+@color:  rgb(0, 115, 234);
+@color-hover: rgb(246, 246, 246); 
+
+.button {
+	height: 30px;
+	line-height: 25px;
+	font-size: 15px;
+	margin: 0;
+	padding: 0 15px;
+	outline: none;
+	background: @background;
+	color: @color;
+	border: solid 1px @border;
+	border-radius: 5px;
+	
+	&:hover {
+		background: @background-hover;
+		color: @color-hover;
+	}
+}
+button {
+	.button;
+}
+input[type="submit"] {
+	.button;
 }
 
 /****************************************

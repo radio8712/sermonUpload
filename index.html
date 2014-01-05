@@ -24,61 +24,77 @@
 		<div class="form">
 			<h1>Sermon Info Update Page</h1>
 
-			<label>Date</label>
-			<input type="text" placeholder="mm/dd/yyyy" data-ng-model="date">
-
-			<label>Service</label>
-			<select data-ng-model="service" data-ng-options="s.option for s in services"></select>
-
-			<label>Speaker</label>
-			<div>
-				<select data-ng-model="speakerTitle" data-ng-options="title.option for title in speakerTitles"></select>
-				<input type="text" placeholder="Name" data-ng-model="speaker">
+			<div class="clear">
+				<label>Date</label>
+				<input type="text" placeholder="mm/dd/yyyy" data-ng-model="date">
 			</div>
-
-			<label>Sermon Title</label>
-			<input type="text" placeholder="Sermon Title" data-ng-model="sermonTitle">
-
-			<label>Text</label>
-			<div>
-				<select data-ng-model="bible.book" data-ng-options="book.name for book in bible.books" data-ng-change="bookChange()">
-<!-- 					<option value="book">Book</option> -->
-				</select>
-				<select data-ng-model="bible.startChap" data-ng-options="chap for chap in bible.startChaps" data-ng-change="startChapChange()">
-<!-- 					<option>1</option> -->
-				</select>:
-				<select data-ng-model="bible.startVerse" data-ng-options="verse for verse in bible.startVerse" data-ng-change="startVerseChange()">
-<!-- 					<option>1</option> -->
-				</select>-
-				<select data-ng-model="bible.endChap" data-ng-options="chap for chap in bible.endChap" data-ng-change="endChapChange()">
-<!-- 					<option>1</option> -->
-				</select>:
-				<select data-ng-model="bible.endVerse" data-ng-options="verse for verse in bible.endVerse" data-ng-change="endVerseChange()">
-<!-- 					<option>1</option> -->
-				</select>
-			</div>
-
-			<label>Sermon Type</label>
-			<select data-ng-model="type" data-ng-options="type.name for type in types"></select>
-
-			<label>Special Info</label>
-			<input type="text" placeholder="Special Information" data-ng-model="specialInfo">
-
-			<label>Filename</label>
-			<div>
-				<form enctype="multipart/form-data">
-					<input type="file" name="myfile"><br>
-					<input type="submit" value="Upload File to Server">
-					<button data-ng-click="resetForm()">Reset</button>
-				</form>
-				<div data-tc-progress="percent">
-<!--
-					<div class="bar" ng-model="bar" style="width: {{percent}}%;"></div>
-					<div class="percent">{{percent}}%</div>
--->
+			<div class="clear">
+				<label>Service</label>
+				<div class="select">
+					<select data-ng-model="service" data-ng-options="s.option for s in services"></select>
+					<span class="fa fa-angle-down"></span>
 				</div>
-
-<!-- 				<div id="status">{{status}}</div> -->
+			</div>
+			<div class="clear">
+				<label>Speaker</label>
+				<div class="select short">
+					<select data-ng-model="speakerTitle" data-ng-options="title.option for title in speakerTitles"></select>
+					<span class="fa fa-angle-down"></span>
+				</div>
+				<input class="short" type="text" placeholder="Name" data-ng-model="speaker">
+			</div>
+			<div class="clear extra">
+				<label>Sermon Title</label>
+				<input type="text" placeholder="Sermon Title" data-ng-model="sermonTitle">
+			</div>
+			<div class="clear">
+				<label>Text</label>
+				<div class="select book">
+					<select data-ng-model="bible.book" data-ng-options="book.name for book in bible.books" data-ng-change="bookChange()"></select>
+					<span class="fa fa-angle-down"></span>
+				</div>
+				<div class="select number">
+					<select data-ng-model="bible.startChap" data-ng-options="chap for chap in bible.startChaps" data-ng-change="startChapChange()"></select>
+					<span class="fa fa-angle-down"></span>
+				</div>
+				:
+				<div class="select number">
+					<select data-ng-model="bible.startVerse" data-ng-options="verse for verse in bible.startVerse" data-ng-change="startVerseChange()"></select>
+					<span class="fa fa-angle-down"></span>
+				</div>
+				-
+				<div class="select number">
+					<select data-ng-model="bible.endChap" data-ng-options="chap for chap in bible.endChap" data-ng-change="endChapChange()"></select>
+					<span class="fa fa-angle-down"></span>
+				</div>
+				:
+				<div class="select number">
+					<select data-ng-model="bible.endVerse" data-ng-options="verse for verse in bible.endVerse" data-ng-change="endVerseChange()"></select>
+					<span class="fa fa-angle-down"></span>
+				</div>
+			</div>
+			<div class="clear">
+				<label>Sermon Type</label>
+				<div class="select">
+					<select data-ng-model="type" data-ng-options="type.name for type in types"></select>
+					<span class="fa fa-angle-down"></span>
+				</div>
+			</div>
+			<div class="clear extra">
+				<label>Special Info</label>
+				<input type="text" placeholder="Special Information" data-ng-model="specialInfo">
+			</div>
+			<div class="clear">
+				<form enctype="multipart/form-data">
+					<label>Filename</label>
+					<input type="file" data-ng-model="sermon">
+					<button data-tc-file="sermon">Choose A Sermon To Upload</button>
+					<span>{{filename}}</span>
+					<div class="clear extra"></div>
+					<input type="submit" value="Upload The Sermon">
+					<button data-ng-click="resetForm()">Reset The Form</button>
+				</form>
+				<div data-tc-progress="percent"></div>
 			</div>
 
 			<p>
@@ -116,7 +132,7 @@ the status of that section at any time
 
 			<!-- Display this section when the file starts the upload process -->
 			<div class="upload">
-<span class="fa" data-ng-class="{spinner: icons.upload.spinner, 'fa-check-circle': icons.upload.success, green: icons.upload.success, 'fa-times-circle': icons.upload.error, red: icons.upload.error}"></span>
+<span class="fa" data-ng-class="{spinner: icons.upload.spinner, 'fa-check-circle green': icons.upload.success, 'fa-times-circle red': icons.upload.error}"></span>
 				<p class="hidden">Uploading sermon audio to Church server</p>
 				<div class="uploadProgress"></div>
 			</div>
