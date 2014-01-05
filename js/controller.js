@@ -1,9 +1,53 @@
 app.controller("Form", function($scope) {
-	$scope.yourName = "Thom Williams";
 
-	$scope.percent = 50;
-	$scope.status = "TEST";
+//--------------------------------------------------------------------------------
+//	Init Variables
+//--------------------------------------------------------------------------------
+	$scope.modal = {
+		visible: true,
+	};
+	$scope.icons = {
+		info: {
+			error: false,
+		},
+		error: false,
+		upload: {
+			spinner: false,
+			success: false,
+			error: false,
+		},
+		convert: {
+			spinner: false,
+			success: false,
+			error: false,
+		},
+		newSpeaker: {
+			spinner: false,
+			success: false,
+			error: false,
+		},
+		remote: {
+			spinner: false,
+			success: false,
+			error: false,
+		},
+		local: {
+			spinner: false,
+			success: false,
+			error: false,
+		},
+	};
 
+	$scope.services = [{value: "m", option: "Morning"},{value: "a", option: "Afternoon"},{value: "e", option: "Evening"}];
+	$scope.service = $scope.services[0];
+
+	$scope.speakerTitles = [{value: "1", option: "Pastor"},{value: "2", option: "Evangelist"},{value: "3", option: "Missionary"}];
+	$scope.speakerTitle = $scope.speakerTitles[0];
+
+
+//--------------------------------------------------------------------------------
+//	Submit the form
+//--------------------------------------------------------------------------------
 	$('form').ajaxForm({
 		url: "upload.php",
 		dataType: "json",

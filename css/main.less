@@ -1,30 +1,72 @@
+/****************************************
+*	Page
+****************************************/
+
 body {
-	padding: 30px;
-}
-form {
-	display: block;
-	margin: 20px auto;
-	background: #eee;
-	border-radius: 10px;
-	padding: 15px;
+	background-image: url("../images/Background.png");
+	background-repeat: repeat-x;
 }
 
-.progress {
-	position:relative;
-	width:400px;
-	border: 1px solid #ddd;
-	padding: 1px;
-	border-radius: 3px;
+.form {
+	background: white;
+	margin: 50px auto 0 auto;
+	width: 700px;
 }
-.bar {
-	background-color: #B4F5B4;
-	width:0%;
-	height:20px;
-	border-radius: 3px;
+
+/****************************************
+*	Icons
+****************************************/
+@red: #c00;
+@green: #070;
+
+.fa {
+	font-size: 25pt;
+	&.red {
+		color: @red;
+	}
+	&.green {
+		color: @green;
+	}
 }
-.percent {
-	position:absolute;
-	display:inline-block;
-	top:3px;
-	left:48%;
+
+/****************************************
+*	Spinner
+****************************************/
+@dimensions: 18px;
+@spin-color: #c00;
+@back-color: #fff;
+
+.spinner {
+	content: '';
+	position: absolute;
+	margin: 6px 0 0 8px;
+	width: @dimensions;
+	height: @dimensions;
+	border-radius: 50%;
+	border-right: solid 3px @back-color;
+	border-top: solid 3px @spin-color;
+	background: @back-color;
+	box-shadow: 0 0 0 4px @back-color;
+	animation: spin 1s linear infinite;
+	-webkit-animation: spin 1s linear infinite;
+}
+
+@keyframes spin
+{
+	0% {
+		transform: rotate(0deg);
+	}
+	50% {
+		transform: rotate(180deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+/****************************************
+*	Modal
+****************************************/
+.modal {
+	
 }
