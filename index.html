@@ -1,11 +1,13 @@
-<!doctype html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html ng-app="SermonUploader">
 	<head>
 		<title>Sermon Info Update Page</title> <!-- Page Title -->
-
+<!-- 		<meta charset="UTF-8"> -->
+		<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
 		<link type="text/css" rel="stylesheet"			href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
 		<link type="text/css" rel="stylesheet"			href="./css/flick/jquery-ui.css" />
 		<link type="text/css" rel="stylesheet/less" href="./css/main.less" />
+<!-- 		<link type="text/css" rel="stylesheet" href="./css/main.css" /> -->
 
 		<script type="text/javascript" src="./js/jquery.js"></script>
 		<script type="text/javascript" src="./js/jquery-ui.js"></script>
@@ -26,7 +28,7 @@
 
 			<div class="clear">
 				<label>Date</label>
-				<input type="text" placeholder="mm/dd/yyyy" data-ng-model="date">
+				<input type="text" placeholder="mm/dd/yyyy" data-ng-model="date" ui-date="dateOptions">
 			</div>
 			<div class="clear">
 				<label>Service</label>
@@ -41,7 +43,8 @@
 					<select data-ng-model="speakerTitle" data-ng-options="title.option for title in speakerTitles"></select>
 					<span class="fa fa-angle-down"></span>
 				</div>
-				<input class="short" type="text" placeholder="Name" data-ng-model="speaker">
+<!-- 				<input class="short" type="text" placeholder="Name" data-ng-model="speaker"> -->
+				<select class="speaker autofill" data-ng-model="speaker" data-ng-options="speaker.option for speaker in speakers"></select>
 			</div>
 			<div class="clear extra">
 				<label>Sermon Title</label>

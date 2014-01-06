@@ -1,0 +1,187 @@
+/****************************************
+*	Page
+****************************************/
+body {
+  background-image: url("../images/Background.png");
+  background-repeat: repeat-x;
+}
+.clear {
+  clear: both;
+  margin: 5px 0;
+}
+.clear.extra {
+  margin: 12px 0 5px 0;
+}
+.form {
+  background: white;
+  margin: 50px auto 0 auto;
+  width: 700px;
+}
+.form label {
+  width: 150px;
+  height: 25px;
+  line-height: 25px;
+  font-size: 20px;
+  display: inline-block;
+}
+.form input[type="text"] {
+  position: relative;
+  top: -1px;
+  width: 530px;
+  height: 25px;
+  line-height: 25px;
+  font-size: 15px;
+  padding: 0 5px;
+  border-radius: 5px;
+  border: solid 1px #cccccc;
+}
+.form input:focus {
+  outline: none;
+  background: #f4f5f7;
+}
+.form input.short {
+  width: 372px;
+}
+.form input[type='file'] {
+  display: none;
+}
+.form .select {
+  position: relative;
+  top: 7px;
+  display: inline-block;
+  width: 540px;
+  height: 25px;
+  line-height: 25px;
+  border-radius: 5px;
+  border: solid 1px #cccccc;
+}
+.form .select .fa {
+  float: right;
+  color: #aaa;
+  margin: -25px 2px 2px 0;
+  line-height: 25px;
+}
+.form .select select {
+  width: 540px;
+  height: 25px;
+  line-height: 25px;
+  padding: 0 5px;
+  font-size: 15px;
+  /* 			font-size: 16px; */
+  background: transparent;
+  outline: none;
+  border: 0;
+  border-radius: 0;
+  appearance: none;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+}
+.form .select.short {
+  width: 152px;
+}
+.form .select.short select {
+  width: 152px;
+}
+.form .select.book {
+  width: 230px;
+}
+.form .select.book select {
+  width: 230px;
+}
+.form .select.number {
+  width: 65px;
+}
+.form .select.number select {
+  width: 65px;
+}
+.button {
+  height: 30px;
+  line-height: 25px;
+  font-size: 15px;
+  margin: 0;
+  padding: 0 15px;
+  outline: none;
+  background: #f6f6f6;
+  color: #0073ea;
+  border: solid 1px #cccccc;
+  border-radius: 5px;
+}
+.button:hover {
+  background: #0073ea;
+  color: #f6f6f6;
+}
+button {
+  height: 30px;
+  line-height: 25px;
+  font-size: 15px;
+  margin: 0;
+  padding: 0 15px;
+  outline: none;
+  background: #f6f6f6;
+  color: #0073ea;
+  border: solid 1px #cccccc;
+  border-radius: 5px;
+}
+button:hover {
+  background: #0073ea;
+  color: #f6f6f6;
+}
+input[type="submit"] {
+  height: 30px;
+  line-height: 25px;
+  font-size: 15px;
+  margin: 0;
+  padding: 0 15px;
+  outline: none;
+  background: #f6f6f6;
+  color: #0073ea;
+  border: solid 1px #cccccc;
+  border-radius: 5px;
+}
+input[type="submit"]:hover {
+  background: #0073ea;
+  color: #f6f6f6;
+}
+/****************************************
+*	Icons
+****************************************/
+.fa {
+  font-size: 25pt;
+}
+.fa.red {
+  color: #cc0000;
+}
+.fa.green {
+  color: #007700;
+}
+/****************************************
+*	Spinner
+****************************************/
+.spinner {
+  content: '';
+  position: absolute;
+  margin: 6px 0 0 8px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border-right: solid 3px #ffffff;
+  border-top: solid 3px #cc0000;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px #ffffff;
+  animation: spin 1s linear infinite;
+  -webkit-animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+/****************************************
+*	Modal
+****************************************/

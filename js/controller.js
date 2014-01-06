@@ -1,8 +1,28 @@
-app.controller("Form", function($scope) {
+app.controller("Form", function($scope, $filter, $http) {
 
 //--------------------------------------------------------------------------------
 //	Init Variables
 //--------------------------------------------------------------------------------
+	var apiRoot = "/sermonUpload/php/api/";
+
+	$scope.services = [{value: "m", option: "Morning"},{value: "a", option: "Afternoon"},{value: "e", option: "Evening"}];
+	$scope.service = $scope.services[0];
+
+	$scope.speakerTitles = [{value: "1", option: "Pastor"},{value: "2", option: "Evangelist"},{value: "3", option: "Missionary"}];
+	$scope.speakerTitle = $scope.speakerTitles[0];
+
+	$scope.speakers = [];
+	$scope.speaker = "";
+
+	$scope.dateOptions = {
+		changeYear: true,
+		changeMonth: true,
+		yearRange: '1963:+1'
+	};
+
+	$scope.date = new Date();
+	$scope.textDate = $filter("date")($scope.date, "yyyy-MM-dd");
+
 	$scope.modal = {
 		visible: true,
 	};
@@ -38,12 +58,18 @@ app.controller("Form", function($scope) {
 		},
 	};
 
-	$scope.services = [{value: "m", option: "Morning"},{value: "a", option: "Afternoon"},{value: "e", option: "Evening"}];
-	$scope.service = $scope.services[0];
+//--------------------------------------------------------------------------------
+//	Get data from Database
+//--------------------------------------------------------------------------------
 
-	$scope.speakerTitles = [{value: "1", option: "Pastor"},{value: "2", option: "Evangelist"},{value: "3", option: "Missionary"}];
-	$scope.speakerTitle = $scope.speakerTitles[0];
-
+	$http.get(apiRoot + "speakers.php").success(function(response) {
+		$scope.speakers = response;
+		console.log(response);
+/* 		$(".speaker.autofill").autocomplete(); */
+	}).error(function(error) {
+		console.log("Could not get speaker list from database.");
+		console.log("Error: ", error);
+	});
 
 //--------------------------------------------------------------------------------
 //	Submit the form
