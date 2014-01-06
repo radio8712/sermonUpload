@@ -407,7 +407,7 @@ app.controller("Form", function($scope, $filter, $http) {
 		console.log("Error: ", error);
 	});
 
-	$http({method: "GET", url: apiRoot + "bible.php?method=init"}).success(function(response) {
+	$http({method: "GET", url: apiRoot + "bible.php", params: {method: 'init'}}).success(function(response) {
 		console.log(response);
 		$scope.bible.books = response.bookList;
 		$scope.bible.book = $scope.bible.books[0];
