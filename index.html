@@ -40,20 +40,26 @@
 			<div class="clear">
 				<label>Speaker</label>
 				<div class="select short">
-					<select data-ng-model="speakerTitle" data-ng-options="title.option for title in speakerTitles"></select>
+					<select data-ng-model="speakerTitle" data-ng-options="title.value as title.option for title in speakerTitles"></select>
 					<span class="fa fa-angle-down"></span>
 				</div>
-<!-- 				<input class="short" type="text" placeholder="Name" data-ng-model="speaker"> -->
-				<select class="speaker autofill" data-ng-model="speaker" data-ng-options="speaker.option for speaker in speakers"></select>
+				<input type="text" class="short speaker autofill" placeholder="Name">
 			</div>
 			<div class="clear extra">
 				<label>Sermon Title</label>
 				<input type="text" placeholder="Sermon Title" data-ng-model="sermonTitle">
 			</div>
+<!--
+			<div class="clear">
+				<p>
+					{{bible.startChaps | json}}
+				</p>
+			</div>
+-->
 			<div class="clear">
 				<label>Text</label>
 				<div class="select book">
-					<select data-ng-model="bible.book" data-ng-options="book.name for book in bible.books" data-ng-change="bookChange()"></select>
+					<select data-ng-model="bible.book" data-ng-options="book.bname for book in bible.books" data-ng-change="bookChange()"></select>
 					<span class="fa fa-angle-down"></span>
 				</div>
 				<div class="select number">
@@ -62,24 +68,24 @@
 				</div>
 				:
 				<div class="select number">
-					<select data-ng-model="bible.startVerse" data-ng-options="verse for verse in bible.startVerse" data-ng-change="startVerseChange()"></select>
+					<select data-ng-model="bible.startVerse" data-ng-options="verse for verse in bible.startVerses" data-ng-change="startVerseChange()"></select>
 					<span class="fa fa-angle-down"></span>
 				</div>
 				-
 				<div class="select number">
-					<select data-ng-model="bible.endChap" data-ng-options="chap for chap in bible.endChap" data-ng-change="endChapChange()"></select>
+					<select data-ng-model="bible.endChap" data-ng-options="chap for chap in bible.endChaps" data-ng-change="endChapChange()"></select>
 					<span class="fa fa-angle-down"></span>
 				</div>
 				:
 				<div class="select number">
-					<select data-ng-model="bible.endVerse" data-ng-options="verse for verse in bible.endVerse" data-ng-change="endVerseChange()"></select>
+					<select data-ng-model="bible.endVerse" data-ng-options="verse for verse in bible.endVerses" data-ng-change="endVerseChange()"></select>
 					<span class="fa fa-angle-down"></span>
 				</div>
 			</div>
 			<div class="clear">
 				<label>Sermon Type</label>
 				<div class="select">
-					<select data-ng-model="type" data-ng-options="type.name for type in types"></select>
+					<select data-ng-model="type" data-ng-options="type.sermon_type for type in types"></select>
 					<span class="fa fa-angle-down"></span>
 				</div>
 			</div>
