@@ -4,7 +4,7 @@
 // return text var_dump for the html request
 $output = array();
 foreach($_FILES as $file) {
-	$outputDir = "";
+	$outputDir = "../../uploads/";
 	$outputFile = $outputDir.$file["name"];
 	move_uploaded_file($file["tmp_name"], $outputFile);
 	array_push($output, $outputFile);

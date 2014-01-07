@@ -2,9 +2,9 @@
 *	Page
 ****************************************/
 @border: #ccc;
-@width: 540px;
-@short-select: 152px;
-@short-input: 382px;
+@width: 400px;
+@short-select: 102px;
+@short-input: 292px;
 
 body {
 	background-image: url("../images/Background.png");
@@ -19,92 +19,113 @@ body {
 	}
 }
 
-.form {
+.container {
 	background: white;
 	margin: 50px auto 0 auto;
-	width: 700px;
-	label {
-		width: 150px;
-		height: 25px;
-		line-height: 25px;
-		font-size: 20px;
-		display: inline-block;
+	width: 800px;
+	height: 500px;
+	h1 {
+		text-align: center;
 	}
-	input {
-		&[type="text"] {
-			position: relative;
-			top: -1px;
-			width: @width - 10;
+	.bible {
+		float:left;
+		width: 250px;
+		height: 440px;
+		overflow: scroll;
+		p {
+			margin: 10px 0;
+		}
+	}
+	.form {
+		float:left;
+		width: 530px;
+		margin: 0 0 0 20px;
+		label {
+			width: 120px;
 			height: 25px;
 			line-height: 25px;
-			font-size: 15px;
-			padding: 0 5px;
-			border-radius: 5px;
-			border: solid 1px @border;
+			font-size: 20px;
+			display: inline-block;
 		}
-		&:focus {
-			outline: none;
-			background: rgb(244, 245, 247);
+		input {
+			&[type="text"] {
+				position: relative;
+				top: -1px;
+				width: @width - 10;
+				height: 25px;
+				line-height: 25px;
+				font-size: 15px;
+				padding: 0 5px;
+				border-radius: 5px;
+				border: solid 1px @border;
+			}
+			&:focus {
+				outline: none;
+				background: rgb(244, 245, 247);
+			}
+			&.short {
+				width: @short-input - 10;
+			}
+			&[type='file'] {
+				display: none;
+			}
 		}
-		&.short {
-			width: @short-input - 10;
-		}
-		&[type='file'] {
-			display: none;
-		}
-	}
-
-	.select {
-		position: relative;
-		top: 7px;
-		display: inline-block;
-		width: @width;
-		height: 25px;
-		line-height: 25px;
-		border-radius: 5px;
-		border: solid 1px @border;
-		.fa{
-			float: right;
-			color: #aaa;
-			margin: -25px 2px 2px 0;
-			line-height: 25px;
-		}
-		select {
+	
+		.select {
+			position: relative;
+			top: 7px;
+			display: inline-block;
 			width: @width;
 			height: 25px;
 			line-height: 25px;
-			padding: 0 5px;
-			font-size: 15px;
-/* 			font-size: 16px; */
-			background: transparent;
-			outline: none;
-			border: 0;
-			border-radius: 0;
-			appearance: none;
-			-moz-appearance: none;
-			-webkit-appearance: none;
-			
-		}
-		&.short {
-			width: @short-select;
+			overflow: hidden;
+			border-radius: 5px;
+			border: solid 1px @border;
+			.fa{
+				float: right;
+				color: #aaa;
+				margin: -25px 2px 2px 0;
+				line-height: 25px;
+				font-size: 20px;
+			}
 			select {
+				position: relative;
+				width: @width;
+				height: 25px;
+				line-height: 25px;
+				padding: 0 5px;
+				font-size: 15px;
+				outline: none;
+				border: none;
+				border-radius: 0;
+				background: transparent;
+				appearance: none;
+				-moz-appearance: radio-container;
+				-webkit-appearance: none;
+				cursor: pointer;
+			}
+			&.short {
 				width: @short-select;
+				select {
+					width: @short-select;
+				}
 			}
-		}
-		&.book {
-			width: 230px;
-			select {
-				width: 230px;
+			&.book {
+				width: 150px;
+				select {
+					width: 150px;
+				}
 			}
-		}
-		&.number {
-			width: 65px;
-			select {
-				width: 65px;
+			&.number {
+				width: 50px;
+				select {
+					width: 65px;
+				}
 			}
 		}
 	}
 }
+
 @background: rgb(246, 246, 246);
 @background-hover: rgb(0, 115, 234);
 @color:  rgb(0, 115, 234);

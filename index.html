@@ -23,94 +23,92 @@
 	</head>
 
 	<body ng-controller="Form">
-		<div class="form">
-			<h1>Sermon Info Update Page</h1>
-
-			<div class="clear">
-				<label>Date</label>
-				<input type="text" placeholder="mm/dd/yyyy" data-ng-model="date" ui-date="dateOptions">
-			</div>
-			<div class="clear">
-				<label>Service</label>
-				<div class="select">
-					<select data-ng-model="service" data-ng-options="s.option for s in services"></select>
-					<span class="fa fa-angle-down"></span>
+		<div class="container">
+		<h1>Sermon Info Update Page</h1>
+			<div class="bible" ng-bind-html="bible.text"></div>
+			<div class="form">
+	
+				<div class="clear">
+					<label>Date</label>
+					<input type="text" placeholder="mm/dd/yyyy" data-ng-model="date" ui-date="dateOptions">
 				</div>
-			</div>
-			<div class="clear">
-				<label>Speaker</label>
-				<div class="select short">
-					<select data-ng-model="speakerTitle" data-ng-options="title.value as title.option for title in speakerTitles"></select>
-					<span class="fa fa-angle-down"></span>
+				<div class="clear">
+					<label>Service</label>
+					<div class="select">
+						<select data-ng-model="service" data-ng-options="s.option for s in services"></select>
+						<span class="fa fa-angle-down"></span>
+					</div>
 				</div>
-				<input type="text" class="short speaker autofill" placeholder="Name">
-			</div>
-			<div class="clear extra">
-				<label>Sermon Title</label>
-				<input type="text" placeholder="Sermon Title" data-ng-model="sermonTitle">
-			</div>
-<!--
-			<div class="clear">
+				<div class="clear">
+					<label>Speaker</label>
+					<div class="select short">
+						<select data-ng-model="speakerTitle" data-ng-options="title.value as title.option for title in speakerTitles"></select>
+						<span class="fa fa-angle-down"></span>
+					</div>
+					<input type="text" class="short speaker autofill" placeholder="Name">
+				</div>
+				<div class="clear extra">
+					<label>Sermon Title</label>
+					<input type="text" placeholder="Sermon Title" data-ng-model="sermonTitle">
+				</div>
+				<div class="clear">
+					<label>Text</label>
+					<div class="select book">
+						<select data-ng-model="bible.book" data-ng-options="book.bname for book in bible.books" data-ng-change="bookChange()"></select>
+						<span class="fa fa-angle-down"></span>
+					</div>
+					<div class="select number">
+						<select data-ng-model="bible.startChap" data-ng-options="chap for chap in bible.startChaps" data-ng-change="startChapChange()"></select>
+						<span class="fa fa-angle-down"></span>
+					</div>
+					:
+					<div class="select number">
+						<select data-ng-model="bible.startVerse" data-ng-options="verse for verse in bible.startVerses" data-ng-change="startVerseChange()"></select>
+						<span class="fa fa-angle-down"></span>
+					</div>
+					-
+					<div class="select number">
+						<select data-ng-model="bible.endChap" data-ng-options="chap for chap in bible.endChaps" data-ng-change="endChapChange()"></select>
+						<span class="fa fa-angle-down"></span>
+					</div>
+					:
+					<div class="select number">
+						<select data-ng-model="bible.endVerse" data-ng-options="verse for verse in bible.endVerses" data-ng-change="endVerseChange()"></select>
+						<span class="fa fa-angle-down"></span>
+					</div>
+				</div>
+				<div class="clear">
+					<label>Sermon Type</label>
+					<div class="select">
+						<select data-ng-model="type" data-ng-options="type.sermon_type for type in types"></select>
+						<span class="fa fa-angle-down"></span>
+					</div>
+				</div>
+				<div class="clear extra">
+					<label>Special Info</label>
+					<input type="text" placeholder="Special Information" data-ng-model="specialInfo">
+				</div>
+				<div class="clear">
+					<form enctype="multipart/form-data">
+						<label>Filename</label>
+						<input type="file" data-ng-model="sermon">
+						<button data-tc-file="sermon">Choose A Sermon To Upload</button>
+						<span>{{filename}}</span>
+						<div class="clear extra"></div>
+						<label></label>
+						<input type="submit" value="Upload The Sermon">
+						<button data-ng-click="resetForm()">Reset The Form</button>
+					</form>
+					<div data-tc-progress="percent"></div>
+				</div>
+	
 				<p>
-					{{bible.startChaps | json}}
+					Press the "Upload The Sermon" button to upload the sermon to the internet.<br>
+					Press the "Reset The Form" button to clear out the form.
 				</p>
 			</div>
--->
-			<div class="clear">
-				<label>Text</label>
-				<div class="select book">
-					<select data-ng-model="bible.book" data-ng-options="book.bname for book in bible.books" data-ng-change="bookChange()"></select>
-					<span class="fa fa-angle-down"></span>
-				</div>
-				<div class="select number">
-					<select data-ng-model="bible.startChap" data-ng-options="chap for chap in bible.startChaps" data-ng-change="startChapChange()"></select>
-					<span class="fa fa-angle-down"></span>
-				</div>
-				:
-				<div class="select number">
-					<select data-ng-model="bible.startVerse" data-ng-options="verse for verse in bible.startVerses" data-ng-change="startVerseChange()"></select>
-					<span class="fa fa-angle-down"></span>
-				</div>
-				-
-				<div class="select number">
-					<select data-ng-model="bible.endChap" data-ng-options="chap for chap in bible.endChaps" data-ng-change="endChapChange()"></select>
-					<span class="fa fa-angle-down"></span>
-				</div>
-				:
-				<div class="select number">
-					<select data-ng-model="bible.endVerse" data-ng-options="verse for verse in bible.endVerses" data-ng-change="endVerseChange()"></select>
-					<span class="fa fa-angle-down"></span>
-				</div>
-			</div>
-			<div class="clear">
-				<label>Sermon Type</label>
-				<div class="select">
-					<select data-ng-model="type" data-ng-options="type.sermon_type for type in types"></select>
-					<span class="fa fa-angle-down"></span>
-				</div>
-			</div>
-			<div class="clear extra">
-				<label>Special Info</label>
-				<input type="text" placeholder="Special Information" data-ng-model="specialInfo">
-			</div>
-			<div class="clear">
-				<form enctype="multipart/form-data">
-					<label>Filename</label>
-					<input type="file" data-ng-model="sermon">
-					<button data-tc-file="sermon">Choose A Sermon To Upload</button>
-					<span>{{filename}}</span>
-					<div class="clear extra"></div>
-					<input type="submit" value="Upload The Sermon">
-					<button data-ng-click="resetForm()">Reset The Form</button>
-				</form>
-				<div data-tc-progress="percent"></div>
-			</div>
-
-			<p>
-				Press the "Submit" button<br>
-				Press the "Reset" button
-			</p>
 		</div>
+
 <!--
 --------------------------------------------------------------------------------
 			Form Submit Modal

@@ -1,1 +1,1 @@
-var app = angular.module("SermonUploader", ["ui.date"]);
+var app = angular.module("SermonUploader", ["ui.date","ngSanitize"]);
