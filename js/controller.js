@@ -322,27 +322,29 @@ app.controller("Form", function($scope, $filter, $http) {
 //--------------------------------------------------------------------------------
 //	Submit the form
 //--------------------------------------------------------------------------------
-	$('form').ajaxForm({
-		url: "php/api/upload.php",
-		dataType: "json",
-		method: "post",
-		beforeSend: function() {
-			$scope.status = "";
-			$scope.percent = 0;
-			$scope.$apply();
-		},
-		uploadProgress: function(event, position, total, percentComplete) {
-			$scope.percent = percentComplete;
-			$scope.$apply();
-		},
-		success: function() {
-			$scope.percent = 100;
-			$scope.$apply();
-		},
-		complete: function(xhr) {
-			$scope.status = xhr.responseText;
-			$scope.$apply();
-		}
-	});
+	$scope.submitForm = function() {
+		$('form').ajaxSubmit({
+			url: "php/api/upload.php",
+			dataType: "json",
+			method: "post",
+			beforeSend: function() {
+				$scope.status = "";
+				$scope.percent = 0;
+				$scope.$apply();
+			},
+			uploadProgress: function(event, position, total, percentComplete) {
+				$scope.percent = percentComplete;
+				$scope.$apply();
+			},
+			success: function() {
+				$scope.percent = 100;
+				$scope.$apply();
+			},
+			complete: function(xhr) {
+				$scope.status = xhr.responseText;
+				$scope.$apply();
+			}
+		});
+	}
 
 });
