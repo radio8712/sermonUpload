@@ -26,7 +26,11 @@ app.controller("Form", function($scope, $filter, $http) {
 	$scope.speakerTitle = $scope.speakerTitles[0].value;
 
 	$scope.speakers = [];
-	$scope.speaker = "";
+	$scope.speaker;
+	$scope.newSpeaker = false;
+	$scope.name = "";
+	$scope.sermonTitle = "";
+	$scope.specialInfo = "";
 
 	$scope.dateOptions = {
 		changeYear: true,
@@ -38,37 +42,41 @@ app.controller("Form", function($scope, $filter, $http) {
 	$scope.textDate = $filter("date")($scope.date, "yyyy-MM-dd");
 
 	$scope.modal = {
-		visible: true,
-	};
-	$scope.icons = {
+		visible: false,
 		info: {
 			error: false,
+			missing: [],
 		},
 		error: false,
 		upload: {
 			spinner: false,
 			success: false,
 			error: false,
+			text: false,
 		},
 		convert: {
 			spinner: false,
 			success: false,
 			error: false,
+			text: false,
 		},
 		newSpeaker: {
 			spinner: false,
 			success: false,
 			error: false,
+			text: false,
 		},
 		remote: {
 			spinner: false,
 			success: false,
 			error: false,
+			text: false,
 		},
 		local: {
 			spinner: false,
 			success: false,
 			error: false,
+			text: false,
 		},
 	};
 
@@ -232,34 +240,6 @@ app.controller("Form", function($scope, $filter, $http) {
 	}
 
 
-/******************************
-	Verse Picker
-******************************/
-
-/********************
-	End Verse Change
-********************/
-
-/*
-	eVerse.change(function(){
-		var info = {};
-		getInfo({
-			method: "verseChange",
-			book: book.val(),
-			startChapter: sChap.val(),
-			startVerse: sVerse.val(),
-			endChapter: eChap.val(),
-			endVerse: eVerse.val(),
-		}, function(response) {
-			info = response;
-		});
-		var verseText = info.verseText;
-		loadVerses($("#verses"), verseText);
-	});
-*/
-
-
-
 //--------------------------------------------------------------------------------
 //	Get data from Database
 //--------------------------------------------------------------------------------
@@ -271,7 +251,7 @@ app.controller("Form", function($scope, $filter, $http) {
 			minLength: 0,
 			source: $scope.speakers,
 			focus: function( event, ui ) {
-				$( ".speaker.autofill" ).val( ui.item.value );
+				$scope.name = ui.item.value;
 				return false;
 			},
 			select: function( event, ui ) {
@@ -302,7 +282,6 @@ app.controller("Form", function($scope, $filter, $http) {
 	});
 
 	$http({method: "GET", url: apiRoot + "bible.php", params: {method: 'init'}}).success(function(response) {
-/* 		console.log(response); */
 		$scope.bible.books = response.bookList;
 		$scope.bible.book = $scope.bible.books[0];
 		arrayFill($scope.bible.startChaps, 1, response.chapNum);
@@ -323,28 +302,60 @@ app.controller("Form", function($scope, $filter, $http) {
 //	Submit the form
 //--------------------------------------------------------------------------------
 	$scope.submitForm = function() {
-		$('form').ajaxSubmit({
-			url: "php/api/upload.php",
-			dataType: "json",
-			method: "post",
-			beforeSend: function() {
-				$scope.status = "";
-				$scope.percent = 0;
-				$scope.$apply();
-			},
-			uploadProgress: function(event, position, total, percentComplete) {
-				$scope.percent = percentComplete;
-				$scope.$apply();
-			},
-			success: function() {
-				$scope.percent = 100;
-				$scope.$apply();
-			},
-			complete: function(xhr) {
-				$scope.status = xhr.responseText;
-				$scope.$apply();
+		// Make sure all needed data exists
+		$scope.modal.visible = true;
+		
+		if ($scope.name == "") {
+			$scope.modal.info.error = true;
+			$scope.modal.info.missing.push("Speaker Name");
+		} else {
+			if ($scope.name != $scope.speaker.value) {
+				var speaker = $filter("filter")($scope.speakers, {value: $scope.name});
+				if (speaker.length == 1) {
+					$scope.speaker = $scope.speakers[$scope.speakers.indexOf(speaker[0])];
+				} else {
+					$scope.newSpeaker = true;
+				}
 			}
-		});
+		}
+		if ($scope.sermonTitle == "") {
+			$scope.modal.info.error = true;
+			$scope.modal.info.missing.push("Sermon Title");
+		}
+		if ($scope.specialInfo == "") {
+			$scope.specialInfo = null;
+		}
+		if ($scope.sermon == undefined) {
+			$scope.modal.info.error = true;
+			$scope.modal.info.missing.push("Sermon File");
+		}
+		if (!$scope.modal.info.error) {
+			console.log("Run it");
+/*
+			$('form').ajaxSubmit({
+				url: "php/api/upload.php",
+				dataType: "json",
+				method: "post",
+				beforeSend: function() {
+					$scope.status = "";
+					$scope.percent = 0;
+					$scope.$apply();
+				},
+				uploadProgress: function(event, position, total, percentComplete) {
+					$scope.percent = percentComplete;
+					$scope.$apply();
+				},
+				success: function() {
+					$scope.percent = 100;
+					$scope.$apply();
+				},
+				complete: function(xhr) {
+					$scope.status = xhr.responseText;
+					$scope.$apply();
+				}
+			});
+*/
+		}
 	}
 
 });
