@@ -3,6 +3,28 @@ app.controller("Form", function($scope, $filter, $http) {
 //--------------------------------------------------------------------------------
 //	Init Variables
 //--------------------------------------------------------------------------------
+	$("form").ajaxForm({
+		url: "php/api/upload.php",
+		dataType: "json",
+		method: "post",
+		beforeSend: function() {
+			$scope.status = "";
+			$scope.percent = 0;
+		},
+		uploadProgress: function(event, position, total, percentComplete) {
+			$scope.percent = percentComplete;
+			$scope.$apply();
+		},
+		success: function() {
+			$scope.percent = 100;
+			$scope.$apply();
+		},
+		complete: function(xhr) {
+			$scope.status = xhr.responseText;
+			$scope.$apply();
+		}
+	});
+
 	var apiRoot = "/sermonUpload/php/api/";
 
 	$scope.bible = {
@@ -45,7 +67,10 @@ app.controller("Form", function($scope, $filter, $http) {
 		visible: false,
 		info: {
 			error: false,
-			missing: [],
+			name: false,
+			title: false,
+			file: false,
+			fileSize: false,
 		},
 		error: false,
 		upload: {
@@ -305,9 +330,11 @@ app.controller("Form", function($scope, $filter, $http) {
 		// Make sure all needed data exists
 		$scope.modal.visible = true;
 		
+
+/*
 		if ($scope.name == "") {
 			$scope.modal.info.error = true;
-			$scope.modal.info.missing.push("Speaker Name");
+			$scope.modal.info.name = true;
 		} else {
 			if ($scope.name != $scope.speaker.value) {
 				var speaker = $filter("filter")($scope.speakers, {value: $scope.name});
@@ -320,41 +347,42 @@ app.controller("Form", function($scope, $filter, $http) {
 		}
 		if ($scope.sermonTitle == "") {
 			$scope.modal.info.error = true;
-			$scope.modal.info.missing.push("Sermon Title");
+			$scope.modal.info.title = true;
 		}
 		if ($scope.specialInfo == "") {
 			$scope.specialInfo = null;
 		}
+*/
 		if ($scope.sermon == undefined) {
 			$scope.modal.info.error = true;
-			$scope.modal.info.missing.push("Sermon File");
+			$scope.modal.info.file = true;
+		} else if ($scope.modal.info.fileSize) {
+			$scope.modal.info.error = true;
 		}
 		if (!$scope.modal.info.error) {
-			console.log("Run it");
-/*
 			$('form').ajaxSubmit({
 				url: "php/api/upload.php",
 				dataType: "json",
 				method: "post",
 				beforeSend: function() {
 					$scope.status = "";
-					$scope.percent = 0;
+					$scope.uploadPercent = 0;
 					$scope.$apply();
 				},
 				uploadProgress: function(event, position, total, percentComplete) {
-					$scope.percent = percentComplete;
+					$scope.uploadPercent = percentComplete;
 					$scope.$apply();
 				},
 				success: function() {
-					$scope.percent = 100;
+					$scope.uploadPercent = 100;
 					$scope.$apply();
 				},
 				complete: function(xhr) {
 					$scope.status = xhr.responseText;
+					console.log($scope.status);
 					$scope.$apply();
 				}
 			});
-*/
 		}
 	}
 

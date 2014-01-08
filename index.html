@@ -91,17 +91,17 @@
 				<div class="clear">
 					<form enctype="multipart/form-data">
 						<label>Filename</label>
-						<input type="file" data-ng-model="sermon">
-						<button data-tc-file="sermon">Choose A Sermon To Upload</button>
-						<span>{{filename}}</span>
+						<input type="file" name="file" accept="audio/mp3" data-ng-model="sermon" data-tc-file="modal">
+						<button data-tc-upload-hide>Choose A Sermon To Upload</button>
 						<div class="clear extra"></div>
 						<label></label>
 						<button data-ng-click="submitForm()">Upload The Sermon</button>
 						<button data-ng-click="resetForm()">Reset The Form</button>
 					</form>
+
 					<div data-tc-progress="percent"></div>
 				</div>
-	
+
 				<p>
 					Press the "Upload The Sermon" button to upload the sermon to the internet.<br>
 					Press the "Reset The Form" button to clear out the form.<br>
@@ -125,15 +125,16 @@ the status of that section at any time
 -->
 
 
-		<div class="modal" data-ng-show="modal.visible" data-tc-modal="modal.visible">
+		<div class="modal" data-ng-show="modal.visible" data-tc-modal="modal">
 			<!-- Display this section when more information is needed in the form -->
 			<div class="moreInfo" data-ng-show="modal.info.error">
-				<span class="fa" data-ng-class="{'fa-times-circle red': icons.info.error}"></span>
-				<p>Information is missing from the form. Please complete the form and try again.</p>
-				<p data-ng-show="modal.info.missing.length > 0">
-					Please include the following:
-					<p data-ng-repeat="item in modal.info.missing">{{item}}</p>
+				<p data-ng-show="modal.info.error && (modal.info.name || modal.info.title || modal.info.file || modal.info.fileSize)">
+					Please correct the following information before proceeding:
 				</p>
+				<p data-ng-show="modal.info.error && modal.info.name"><span class="fa fa-asterisk red"></span> Please enter a name for the speaker.</p>
+				<p data-ng-show="modal.info.error && modal.info.title"><span class="fa fa-asterisk red"></span> Please enter a title for the sermon.</p>
+				<p data-ng-show="modal.info.error && modal.info.file"><span class="fa fa-asterisk red"></span> Please select a file to upload</p>
+				<p data-ng-show="modal.info.error && modal.info.fileSize"><span class="fa fa-asterisk red"></span> The selected file is too large. Please select a file smaller than 100MB.</p>
 			</div>
 
 			<!-- Display this section when an error has occured and the user needs to start over -->
@@ -146,7 +147,7 @@ the status of that section at any time
 			<div class="upload">
 				<span class="fa" data-ng-class="{spinner: modal.upload.spinner, 'fa-check-circle green': modal.upload.success, 'fa-times-circle red': modal.upload.error}"></span>
 				<p data-ng-show="modal.upload.text">Uploading sermon audio to Church server</p>
-				<div class="uploadProgress"></div>
+				<div class="uploadProgress" data-tc-progress-bar="uploadPercent"></div>
 			</div>
 
 			<!-- Display this section if the upload was successful when the file is being converted -->
