@@ -19,8 +19,18 @@ app.controller("Form", function($scope, $filter, $http, $interval) {
 		text: null,
 	};
 
+	$scope.date = new Date();
+	$scope.textDate = $filter("date")($scope.date, "yyyy-MM-dd");
+
 	$scope.services = [{value: "m", option: "Morning"},{value: "a", option: "Afternoon"},{value: "e", option: "Evening"}];
-	$scope.service = $scope.services[0];
+	var hour = $filter("date")($scope.date, "H");
+	if (hour < 12) {
+		$scope.service = $scope.services[0];
+	} else if (hour < 16) {
+		$scope.service = $scope.services[1];
+	} else {
+		$scope.service = $scope.services[2];
+	}
 
 	$scope.speakerTitles = [{value: "1", option: "Pastor"},{value: "2", option: "Evangelist"},{value: "3", option: "Missionary"}];
 	$scope.speakerTitle = $scope.speakerTitles[0].value;
@@ -37,9 +47,6 @@ app.controller("Form", function($scope, $filter, $http, $interval) {
 		changeMonth: true,
 		yearRange: '1963:+1'
 	};
-
-	$scope.date = new Date();
-	$scope.textDate = $filter("date")($scope.date, "yyyy-MM-dd");
 
 	$scope.modal = {
 		visible: false,
@@ -434,5 +441,13 @@ app.controller("Form", function($scope, $filter, $http, $interval) {
 			});
 		}
 	}
+
+//--------------------------------------------------------------------------------
+//	Watch for changes
+//--------------------------------------------------------------------------------
+
+	$scope.$watch("date", function(date) {
+		$scope.textDate = $filter("date")($scope.date, "yyyy-MM-dd");
+	});
 
 });
