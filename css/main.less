@@ -173,7 +173,7 @@ button:not(.ui-button) {
 
 .spinner {
 	content: '';
-	position: absolute;
+	position: relative;
 	margin: 6px 0 0 8px;
 	width: @dimensions;
 	height: @dimensions;
@@ -203,9 +203,32 @@ button:not(.ui-button) {
 *	Modal
 ****************************************/
 .modal {
+
+	p.text {
+		display: inline-block;
+	}
 	.moreInfo {
 		.fa {
 			font-size: 15px;
 		}
+	}
+	.progress {
+		position:relative;
+		width:400px;
+		border: 1px solid #ddd;
+		padding: 1px;
+		border-radius: 3px;
+	}
+	.bar {
+		background-color: #B4F5B4;
+		width:0%;
+		height:20px;
+		border-radius: 3px;
+	}
+	.percent {
+		position:absolute;
+		display:inline-block;
+		top:3px;
+		left:48%;
 	}
 }

@@ -1,30 +1,8 @@
-app.controller("Form", function($scope, $filter, $http) {
+app.controller("Form", function($scope, $filter, $http, $interval) {
 
 //--------------------------------------------------------------------------------
 //	Init Variables
 //--------------------------------------------------------------------------------
-	$("form").ajaxForm({
-		url: "php/api/upload.php",
-		dataType: "json",
-		method: "post",
-		beforeSend: function() {
-			$scope.status = "";
-			$scope.percent = 0;
-		},
-		uploadProgress: function(event, position, total, percentComplete) {
-			$scope.percent = percentComplete;
-			$scope.$apply();
-		},
-		success: function() {
-			$scope.percent = 100;
-			$scope.$apply();
-		},
-		complete: function(xhr) {
-			$scope.status = xhr.responseText;
-			$scope.$apply();
-		}
-	});
-
 	var apiRoot = "/sermonUpload/php/api/";
 
 	$scope.bible = {
@@ -74,16 +52,21 @@ app.controller("Form", function($scope, $filter, $http) {
 		},
 		error: false,
 		upload: {
+			progress: false,
+			percent: 0,
 			spinner: false,
 			success: false,
 			error: false,
 			text: false,
 		},
 		convert: {
+			progress: false,
+			percent: 0,
 			spinner: false,
 			success: false,
 			error: false,
 			text: false,
+			timer: null,
 		},
 		newSpeaker: {
 			spinner: false,
@@ -152,22 +135,38 @@ app.controller("Form", function($scope, $filter, $http) {
 	}
 
 	var convertAudioFile = function(options, callback) {
+		$scope.modal.convert.text = true;
+		$scope.modal.convert.spinner = true;
+		$scope.modal.convert.progress = true;
+
 		$http({method: "GET", url: apiRoot + "init.php"}).success(function(response) {
 			var id = response.id
 
-			// Setup and interval to loop through this function
-			$http({method: "GET", url: apiRoot + "percent.php", params: response}).success(function(response) {
-				// Update the conversion percentage
-			}).error(function(error) {
+			$scope.modal.convert.timer = $interval(function() {
+				$http({method: "GET", url: apiRoot + "percent.php", params: response}).success(function(response) {
+					$scope.modal.convert.percent = parseInt(response.number);
+				}).error(function(error) {
+					$scope.modal.convert.spinner = false;
+					$scope.modal.convert.error = true;
+					console.log("Error: ", error);
+				});
+			}, 50);
+
+			options.id = id;
+			$http({method: "GET", url: apiRoot + "lame.php", params: options}).success(function(response) {
+				$interval.cancel($scope.modal.convert.timer);
 				$scope.modal.convert.spinner = false;
-				$scope.modal.convert.error = true;
-				console.log("Error: ", error);
-			});
-
-
-			$http({method: "GET", url: apiRoot + "lame.php", params: {id: id, name: options.name + ".tmp" , upload_dir: options.upload_dir, new_name: options.name + ".tmp"}}).success(function(response) {
-				// Conversion is done
+				if (response.status == 0) {
+					$scope.modal.convert.percent = 100;
+					$scope.modal.convert.success = true;
+					checkForNewSpeaker();
+				} else {
+					console.log(response.status);
+					$scope.modal.convert.spinner = false;
+					$scope.modal.convert.error = true;
+				}
 			}).error(function(error) {
+				$interval.cancel($scope.modal.convert.timer);
 				$scope.modal.convert.spinner = false;
 				$scope.modal.convert.error = true;
 				console.log("Error: ", error);
@@ -392,31 +391,44 @@ app.controller("Form", function($scope, $filter, $http) {
 			$scope.modal.info.error = true;
 		}
 		if (!$scope.modal.info.error) {
+			var tempName = $scope.textDate + $filter("date")($scope.date, "EEE").toLowerCase() + $scope.service.value;
+			$scope.sermonInfo = {
+				name: tempName + ".tmp",
+				new_name: tempName + ".mp3",
+			};
 			$('form').ajaxSubmit({
 				url: "php/api/upload.php",
 				method: "post",
-				data: {name: $scope.textDate},
+				data: {name: $scope.sermonInfo.name},
 				dataType: "json",
 				beforeSend: function() {
+					$scope.modal.upload.success = false;
+					$scope.modal.upload.error = false;
 					$scope.modal.upload.text = true;
 					$scope.modal.upload.spinner = true;
-					$scope.uploadPercent = 0;
+					$scope.modal.upload.progress = true;
+					$scope.modal.upload.percent = 0;
 				},
 				uploadProgress: function(event, position, total, percentComplete) {
-					$scope.uploadPercent = percentComplete;
+					$scope.modal.upload.percent = percentComplete;
 					$scope.$apply();
 				},
 				success: function(response) {
 					$scope.modal.upload.success = true;
-					$scope.uploadPercent = 100;
+					$scope.modal.upload.percent = 100;
 					$scope.$apply();
-					convertAudioFile(response[0], checkForNewSpeaker);
+					$scope.sermonInfo.upload_dir = response[0].upload_dir;
+					console.log($scope.sermonInfo);
+					convertAudioFile($scope.sermonInfo, checkForNewSpeaker);
 				},
 				error: function(error) {
+					console.log(error);
 					$scope.modal.upload.error = true;
+					$scope.modal.upload.progess = false;
 				},
 				complete: function(xhr) {
 					$scope.modal.upload.spinner = false;
+					$scope.status = xhr.responseText;
 					$scope.$apply();
 				}
 			});

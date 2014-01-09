@@ -19,28 +19,36 @@ $error = 0;	// Set error flag to false
 $name = str_replace(" ", "\ ",$name);			// Add slashes to any spaces in the file name
 
 // Lame instruction for development use
-$lame = "/opt/local/bin/lame --mp3input -a -b 64 $upload_dir/$name $upload_dir/$new_name";
+$lame = "/opt/local/bin/lame --mp3input -a -b 64 ".$upload_dir.$name." ".$upload_dir.$new_name;
 // Lame instruction for deployment use
-//$lame = "/src/lame/frontend/lame --mp3input -a -b 64 $upload_dir/$name $upload_dir/$new_name";
+/* $lame = "/src/lame/frontend/lame --mp3input -a -b 64 ".$upload_dir.$name." ".$upload_dir.$new_name; */
 
 // Delete the temporary file
-$del_file = "rm -f $upload_dir/$name";
+$del_file = "rm -f ".$upload_dir.$name;
 
 
 // Convert the file with lame
 
 $yourParserRegex = "/[0-9]{1,3}%/";
 $handle  = popen($lame . ' 2>&1', 'r');
+$percent = 0;
 
 while (!feof($handle))
 {
 	$line = stream_get_line($handle, 2048, "[A[A[A");
 	preg_match($yourParserRegex, $line, $data);
-	$data = explode("%", $data[0]);
-	$myLame->set_percent($id, $data[0]);
+
+	$percent = explode("%", $data[0]);
+	$percent = $percent[0];
+	$myLame->set_percent($id, $percent);
 }
 
-$error = 0;
+if ($percent == 100) {
+	$error = 0;
+} else {
+	$error = 1;
+}
+
 $output = array("status" => $error);
 echo json_encode($output);
 
