@@ -30,7 +30,7 @@
 	
 				<div class="clear">
 					<label>Date</label>
-					<input type="text" placeholder="mm/dd/yyyy" data-ng-model="date" ui-date="dateOptions">
+					<input type="text" placeholder="mm/dd/yyyy" data-ng-model="date" data-ui-date="dateOptions">
 				</div>
 				<div class="clear">
 					<label>Service</label>
@@ -105,7 +105,7 @@
 				<p>
 					Press the "Upload The Sermon" button to upload the sermon to the internet.<br>
 					Press the "Reset The Form" button to clear out the form.<br>
-					{{modal.visible ? "TRUE" : "FALSE"}}
+					{{status}}
 				</p>
 			</div>
 		</div>

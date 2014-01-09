@@ -147,6 +147,38 @@ app.controller("Form", function($scope, $filter, $http) {
 		}
 	}
 
+	var checkForNewSpeaker = function() {
+		
+	}
+
+	var convertAudioFile = function(options, callback) {
+		$http({method: "GET", url: apiRoot + "init.php"}).success(function(response) {
+			var id = response.id
+
+			// Setup and interval to loop through this function
+			$http({method: "GET", url: apiRoot + "percent.php", params: response}).success(function(response) {
+				// Update the conversion percentage
+			}).error(function(error) {
+				$scope.modal.convert.spinner = false;
+				$scope.modal.convert.error = true;
+				console.log("Error: ", error);
+			});
+
+
+			$http({method: "GET", url: apiRoot + "lame.php", params: {id: id, name: options.name + ".tmp" , upload_dir: options.upload_dir, new_name: options.name + ".tmp"}}).success(function(response) {
+				// Conversion is done
+			}).error(function(error) {
+				$scope.modal.convert.spinner = false;
+				$scope.modal.convert.error = true;
+				console.log("Error: ", error);
+			});
+		}).error(function(error) {
+			$scope.modal.convert.spinner = false;
+			$scope.modal.convert.error = true;
+			console.log("Error: ", error);
+		});
+	}
+
 	$scope.bookChange = function() {
 		var params = {
 			method: 'bookChange',
@@ -362,24 +394,29 @@ app.controller("Form", function($scope, $filter, $http) {
 		if (!$scope.modal.info.error) {
 			$('form').ajaxSubmit({
 				url: "php/api/upload.php",
-				dataType: "json",
 				method: "post",
+				data: {name: $scope.textDate},
+				dataType: "json",
 				beforeSend: function() {
-					$scope.status = "";
+					$scope.modal.upload.text = true;
+					$scope.modal.upload.spinner = true;
 					$scope.uploadPercent = 0;
-					$scope.$apply();
 				},
 				uploadProgress: function(event, position, total, percentComplete) {
 					$scope.uploadPercent = percentComplete;
 					$scope.$apply();
 				},
-				success: function() {
+				success: function(response) {
+					$scope.modal.upload.success = true;
 					$scope.uploadPercent = 100;
 					$scope.$apply();
+					convertAudioFile(response[0], checkForNewSpeaker);
+				},
+				error: function(error) {
+					$scope.modal.upload.error = true;
 				},
 				complete: function(xhr) {
-					$scope.status = xhr.responseText;
-					console.log($scope.status);
+					$scope.modal.upload.spinner = false;
 					$scope.$apply();
 				}
 			});

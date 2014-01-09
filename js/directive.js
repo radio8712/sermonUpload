@@ -70,7 +70,6 @@ app.directive("tcProgressBar", function() {
 			});
 			scope.$watch("percent", function(percent) {
 				element.progressbar("option", "value", percent);
-				console.log(percent);
 			});
 		},
 	};
