@@ -12,10 +12,20 @@ else if ($_GET) extract($_GET);
 // Set error flag to false
 $error = 0;
 
-// Lame instruction for development use
-$lame = "/opt/local/bin/lame --mp3input -a -b 64 ".$upload_dir.$name." ".$upload_dir.$new_name;
-// Lame instruction for deployment use
-/* $lame = "/src/lame/frontend/lame --mp3input -a -b 64 ".$upload_dir.$name." ".$upload_dir.$new_name; */
+// Set the root for the LAME command depending on which system is running
+$lame = " --mp3input -a -b 64 ".$upload_dir.$name." ".$upload_dir.$new_name;
+if ($_SERVER['SERVER_NAME'] == "sermons.dillpixel.com") {
+	// Web server used for CIE Project
+	$lame_root = "/usr/bin/lame";
+} else if ($_SERVER['SERVER_NAME'] == "localhost") {
+	// Development test server
+	$lame_root = "/opt/local/bin/lame";
+} else {
+	// Deployment server on church intranet
+	$lame_root = "/src/lame/frontend/lame";
+}
+// Build LAME command
+$lame = $lame_root." --mp3input -a -b 64 ".$upload_dir.$name." ".$upload_dir.$new_name;
 
 // Command to delete the temporary file
 $del_file = "rm -f ".$upload_dir.$name;
