@@ -70,61 +70,63 @@ body {
 				display: none;
 			}
 		}
-	
-		.select {
-			position: relative;
-			top: 7px;
-			display: inline-block;
-			width: @width;
-			height: 25px;
-			line-height: 25px;
-			overflow: hidden;
-			border-radius: 5px;
-			border: solid 1px @border;
-			.fa{
-				float: right;
-				color: #aaa;
-				margin: -25px 2px 2px 0;
-				line-height: 25px;
-				font-size: 20px;
-			}
-			select {
-				position: relative;
-				width: @width;
-				height: 25px;
-				line-height: 25px;
-				padding: 0 5px;
-				font-size: 15px;
-				outline: none;
-				border: none;
-				border-radius: 0;
-				background: transparent;
-				appearance: none;
-				-moz-appearance: radio-container;
-				-webkit-appearance: none;
-				cursor: pointer;
-			}
-			&.short {
-				width: @short-select;
-				select {
-					width: @short-select;
-				}
-			}
-			&.book {
-				width: 150px;
-				select {
-					width: 150px;
-				}
-			}
-			&.number {
-				width: 50px;
-				select {
-					width: 65px;
-				}
-			}
+	}
+}
+
+
+.select {
+	position: relative;
+	top: 7px;
+	display: inline-block;
+	width: @width;
+	height: 25px;
+	line-height: 25px;
+	overflow: hidden;
+	border-radius: 5px;
+	border: solid 1px @border;
+	.fa{
+		float: right;
+		color: #aaa;
+		margin: -25px 2px 2px 0;
+		line-height: 25px;
+		font-size: 20px;
+	}
+	select {
+		position: relative;
+		width: @width;
+		height: 25px;
+		line-height: 25px;
+		padding: 0 5px;
+		font-size: 15px;
+		outline: none;
+		border: none;
+		border-radius: 0;
+		background: transparent;
+		appearance: none;
+		-moz-appearance: radio-container;
+		-webkit-appearance: none;
+		cursor: pointer;
+	}
+	&.short {
+		width: @short-select;
+		select {
+			width: @short-select;
+		}
+	}
+	&.book {
+		width: 150px;
+		select {
+			width: 150px;
+		}
+	}
+	&.number {
+		width: 50px;
+		select {
+			width: 65px;
 		}
 	}
 }
+
 
 @background: rgb(246, 246, 246);
 @background-hover: rgb(0, 115, 234);
@@ -230,5 +232,19 @@ button:not(.ui-button) {
 		display:inline-block;
 		top:3px;
 		left:48%;
+	}
+}
+
+/****************************************
+*	Sermon Viewer Styles
+****************************************/
+
+.viewer {
+	background: white;
+	margin: 50px auto 0 auto;
+	width: 800px;
+	height: 500px;
+	h1 {
+		text-align: center;
 	}
 }

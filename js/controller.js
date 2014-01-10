@@ -1,4 +1,7 @@
-app.controller("Form", function($scope, $filter, $http, $interval, $location) {
+// initialize the angular app for the sermon uploader
+var app = angular.module("SermonUploader", ["ui.date","ngSanitize"]);
+
+app.controller("Form", function($scope, $filter, $http, $interval, $location, $timeout) {
 
 //--------------------------------------------------------------------------------
 //	Init Variables
@@ -216,24 +219,30 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 	var submitToLocalDatabase = function() {
 		$scope.modal.local.text = true;
 		$scope.modal.local.spinner = true;
-		$http({method: "GET", url: apiRoot + "local.php", params: $scope.databaseInfo}).success(function(response) {
-			$scope.modal.local.spinner = false;
-			if (!response.error && response.result == "00000") {
-				$scope.modal.local.success = true;
-				$scope.modal.complete = true;
-				$scope.resetForm();
-			} else {
+
+
+// Set delay to make the site feel more real
+// Adding a delay makes the site feel like it is doing something since this operation takes less than 1 second
+		$timeout(function() {
+			$http({method: "GET", url: apiRoot + "local.php", params: $scope.databaseInfo}).success(function(response) {
+				$scope.modal.local.spinner = false;
+				if (!response.error && response.result == "00000") {
+					$scope.modal.local.success = true;
+					$scope.modal.complete = true;
+					$scope.resetForm();
+				} else {
+					$scope.modal.error = true;
+					$scope.modal.local.error = true;
+					console.log("Result: ", response.result);
+					console.log("Error: ", response.error);
+				}
+			}).error(function(error) {
 				$scope.modal.error = true;
+				$scope.modal.local.spinner = false;
 				$scope.modal.local.error = true;
-				console.log("Result: ", response.result);
-				console.log("Error: ", response.error);
-			}
-		}).error(function(error) {
-			$scope.modal.error = true;
-			$scope.modal.local.spinner = false;
-			$scope.modal.local.error = true;
-			console.log("Error: ", error);
-		});
+				console.log("Error: ", error);
+			});
+		}, 1500);
 	}
 
 // Create the object that will be submitted to both databases and
@@ -259,29 +268,34 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 			remote_filename: $scope.sermonInfo.new_name,
 			local_filename: $scope.sermonInfo.old_name,
 		};
-		$http({method: "GET", url: apiRoot + "remote.php", params: $scope.databaseInfo}).success(function(response) {
-			$scope.modal.remote.spinner = false;
-			if (!response.error && response.result == "00000") {
-				$scope.modal.remote.success = true;
-				if (remoteOnly) {
-					$scope.modal.complete = true;
-					$scope.resetForm();
+
+// Set delay to make the site feel more real
+// Adding a delay makes the site feel like it is doing something since this operation takes less than 1 second
+		$timeout(function() {
+			$http({method: "GET", url: apiRoot + "remote.php", params: $scope.databaseInfo}).success(function(response) {
+				$scope.modal.remote.spinner = false;
+				if (!response.error && response.result == "00000") {
+					$scope.modal.remote.success = true;
+					if (remoteOnly) {
+						$scope.modal.complete = true;
+						$scope.resetForm();
+					} else {
+						submitToLocalDatabase();
+					}
 				} else {
-					submitToLocalDatabase();
+					$scope.modal.error = true;
+					$scope.modal.remote.error = true;
+					console.log(response);
+					console.log("Result: ", response.result);
+					console.log("Error: ", response.error);
 				}
-			} else {
+			}).error(function(error) {
 				$scope.modal.error = true;
+				$scope.modal.remote.spinner = false;
 				$scope.modal.remote.error = true;
-				console.log(response);
-				console.log("Result: ", response.result);
-				console.log("Error: ", response.error);
-			}
-		}).error(function(error) {
-			$scope.modal.error = true;
-			$scope.modal.remote.spinner = false;
-			$scope.modal.remote.error = true;
-			console.log("Error: ", error);
-		});
+				console.log("Error: ", error);
+			});
+		}, 1500);
 	}
 
 // Check to see if the speaker needs to be added to the database
@@ -292,33 +306,41 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 		} else {
 			$scope.modal.newSpeaker.text = true;
 			$scope.modal.newSpeaker.spinner = true;
-			var speaker = {
-				method: "saveNewSpeaker",
-				title_id: $scope.speakerTitle,
-				name: $scope.name,
-			};
-			$http({method: "GET", url: apiRoot + "speakers.php", params: speaker}).success(function(response) {
-				$scope.modal.newSpeaker.spinner = false;
-				if (!response.error && response.speaker_id) {
-					$scope.modal.newSpeaker.success = true;
-					// Save the id to the speaker and send the sermon info the remote database
-					$scope.speaker = {
-						speaker_id: response.speaker_id,
+
+// Set delay to make the site feel more real
+// Adding a delay makes the site feel like it is doing something since this operation takes less than 1 second
+			$timeout(function() {
+				var speaker = {
+					method: "saveNewSpeaker",
+					title_id: $scope.speakerTitle,
+					name: $scope.name,
+				};
+				$http({method: "GET", url: apiRoot + "speakers.php", params: speaker}).success(function(response) {
+					$scope.modal.newSpeaker.spinner = false;
+					if (!response.error && response.speaker_id) {
+						$scope.modal.newSpeaker.success = true;
+						// Save the id to the speaker and send the sermon info the remote database
+						$scope.speaker = {
+							speaker_id: response.speaker_id,
+						}
+						submitToRemoteDatabase();
+					} else {
+						$scope.modal.error = true;
+						$scope.modal.newSpeaker.error = true;
+						console.log("Error: ", response.error);
 					}
-					submitToRemoteDatabase();
-				} else {
+				}).error(function(error) {
 					$scope.modal.error = true;
+					$scope.modal.newSpeaker.spinner = false;
 					$scope.modal.newSpeaker.error = true;
-					console.log("Error: ", response.error);
-				}
-			}).error(function(error) {
-				$scope.modal.error = true;
-				$scope.modal.newSpeaker.spinner = false;
-				$scope.modal.newSpeaker.error = true;
-				console.log("Error: ", error);
-			});
+					console.log("Error: ", error);
+				});
+			}, 1000);
 		}
 	}
+
+
+
 
 // Prepare the audio for the internet
 	var convertAudioFile = function(options, callback) {
@@ -328,16 +350,23 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 
 		$http({method: "GET", url: apiRoot + "init.php"}).success(function(response) {
 			options.id = response.id;
+
+
+
 			$scope.modal.convert.timer = $interval(function() {
 				$http({method: "GET", url: apiRoot + "percent.php", params: response}).success(function(response) {
-					$scope.modal.convert.percent = parseInt(response.number);
+					if (response && response.number) {
+						$scope.modal.convert.percent = parseInt(response.number);
+					}
 				}).error(function(error) {
 					$scope.modal.error = true;
 					$scope.modal.convert.spinner = false;
 					$scope.modal.convert.error = true;
 					console.log("Error: ", error);
 				});
-			}, 50);
+			}, 200);
+
+
 
 			$http({method: "GET", url: apiRoot + "lame.php", params: options}).success(function(response) {
 				$interval.cancel($scope.modal.convert.timer);
@@ -373,12 +402,10 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 			console.log("Error: ", error);
 		});
 	}
-/*
-$scope.submitForm = function() {
-	$scope.modal.visible = true;
-	$scope.modal.complete = true;
-};
-*/
+
+
+
+
 // Submit the form and upload the audio file
 	$scope.submitForm = function() {
 		$scope.modal.visible = true;
@@ -664,5 +691,22 @@ $scope.submitForm = function() {
 //	date Text to match the date of the date object
 	$scope.$watch("date", function(date) {
 		$scope.textDate = $filter("date")($scope.date, "yyyy-MM-dd");
+	});
+
+// Watch for the modal to close. When it closes reset all the status flags
+	$scope.$watch("modal.visible", function(visible) {
+		if (visible == false) {
+			for (var key in $scope.modal) {
+				if ($scope.modal[key] == true) {
+					$scope.modal[key] = false;
+				} else if ($scope.modal[key] != false) {
+					for (var i in $scope.modal[key]) {
+						if ($scope.modal[key][i] == true) {
+							$scope.modal[key][i] = false;
+						}
+					}
+				}
+			}
+		}
 	});
 });
