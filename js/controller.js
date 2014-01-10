@@ -3,12 +3,18 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 //--------------------------------------------------------------------------------
 //	Init Variables
 //--------------------------------------------------------------------------------
+// Temp variabless
 	var remoteOnly = true;
+
+// API root is used for all HTTP requests to provide a dynamic context
+	var webRoot = "/";
 	var apiRoot = "/php/api/";
 	if ($location.host() == "localhost") {
 		apiRoot = "/sermonUpload" + apiRoot;
+		webRoot = "/sermonUpload" + webRoot;
 	}
 
+// Init the verse selector
 	$scope.bible = {
 		books: [],
 		book: null,
@@ -23,22 +29,31 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 		text: null,
 	};
 
+// Start the date with today's date
 	$scope.date = new Date();
 	$scope.textDate = $filter("date")($scope.date, "yyyy-MM-dd");
 
-	$scope.services = [{value: "m", option: "Morning"},{value: "a", option: "Afternoon"},{value: "e", option: "Evening"}];
-	var hour = $filter("date")($scope.date, "H");
-	if (hour < 12) {
-		$scope.service = $scope.services[0];
-	} else if (hour < 16) {
-		$scope.service = $scope.services[1];
-	} else {
-		$scope.service = $scope.services[2];
-	}
+// Set the options for the date picker
+	$scope.dateOptions = {
+		changeYear: true,
+		changeMonth: true,
+		yearRange: '1963:+1'
+	};
 
+
+// Set the services
+	$scope.services = [
+		{value: "m", option: "Morning"},
+		{value: "a", option: "Afternoon"},
+		{value: "e", option: "Evening"}
+	];
+
+
+// Set the speaker titles
 	$scope.speakerTitles = [{value: "1", option: "Pastor"},{value: "2", option: "Evangelist"},{value: "3", option: "Missionary"}];
 	$scope.speakerTitle = $scope.speakerTitles[0].value;
 
+// Declare the other variables used that are initialized to null or empty values
 	$scope.speakers = [];
 	$scope.speaker;
 	$scope.newSpeaker = false;
@@ -47,12 +62,8 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 	$scope.specialInfo = "";
 	$scope.fileName = null;
 	$scope.databaseInfo = {};
-	$scope.dateOptions = {
-		changeYear: true,
-		changeMonth: true,
-		yearRange: '1963:+1'
-	};
 
+// Setup the modal status control object
 	$scope.modal = {
 		visible: false,
 		complete: false,
@@ -101,10 +112,13 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 		},
 	};
 
+
 //--------------------------------------------------------------------------------
 //	Page functions
 //--------------------------------------------------------------------------------
 
+// Fill the specified array from the start value to the end value
+// This is used in the verse picker to adjust the chapter and verse values
 	var arrayFill = function(array, start, end) {
 		start = parseInt(start);
 		end = parseInt(end);
@@ -139,6 +153,66 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 		}
 	}
 
+	var setDefaultService = function() {
+// Set the service based on the time of day
+		var hour = $filter("date")($scope.date, "H");
+		if (hour < 12) {
+			$scope.service = $scope.services[0];
+		} else if (hour < 16) {
+			$scope.service = $scope.services[1];
+		} else {
+			$scope.service = $scope.services[2];
+		}
+	}
+	setDefaultService();
+
+	$scope.goToSermonsPage = function(page) {
+		window.location.href = webRoot + "sermons";
+	}
+
+	// This function allows the user to reset the form by clicking the button
+	// It also gives me a function to call at the end of the chain to reset the form
+	$scope.resetForm = function() {
+		$scope.date = new Date();
+		setDefaultService();
+		$scope.speakerTitle = "1";
+		$scope.speaker = null;
+		$scope.name = "";
+		$scope.sermonTitle = "";
+		$scope.bible.book = $scope.bible.books[0];
+		$scope.bookChange();
+		$scope.type = $scope.types[0];
+		$scope.specialInfo = "";
+		$scope.sermon = null;
+		$scope.modal.error = false;
+		for (var i in $scope.modal.info) {
+			$scope.modal.info[i] = false;
+		}
+	}
+
+//--------------------------------------------------------------------------------
+//	Form submission functions
+//--------------------------------------------------------------------------------
+
+//--------------------------------------------------------------------------------
+//	The following functions are asynchronous functions that 
+//	callback the next step in the sermon submission process.
+//	This allows the entire process to remain stay running in
+//	order and not complete one step before the previous has completed.
+//
+//	Each function in this chain is created before it is called to
+//		prevent any problems.
+//
+//	The order is as follows:
+//		Upload the audio file
+//		Convert the audio file to a web friendly bitrate
+//		check for a new speaker to be added to the list
+//			add if necessary or move on to the next step
+//		Add the sermon to the remote (web facing) database
+//		Add the sermon to the local (intranet/private) database
+//--------------------------------------------------------------------------------
+
+// Update the local database
 	var submitToLocalDatabase = function() {
 		$scope.modal.local.text = true;
 		$scope.modal.local.spinner = true;
@@ -147,18 +221,23 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 			if (!response.error && response.result == "00000") {
 				$scope.modal.local.success = true;
 				$scope.modal.complete = true;
+				$scope.resetForm();
 			} else {
+				$scope.modal.error = true;
 				$scope.modal.local.error = true;
 				console.log("Result: ", response.result);
 				console.log("Error: ", response.error);
 			}
 		}).error(function(error) {
+			$scope.modal.error = true;
 			$scope.modal.local.spinner = false;
 			$scope.modal.local.error = true;
 			console.log("Error: ", error);
 		});
 	}
 
+// Create the object that will be submitted to both databases and
+// Update the remote database
 	var submitToRemoteDatabase = function() {
 		$scope.modal.remote.text = true;
 		$scope.modal.remote.spinner = true;
@@ -186,22 +265,26 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 				$scope.modal.remote.success = true;
 				if (remoteOnly) {
 					$scope.modal.complete = true;
+					$scope.resetForm();
 				} else {
 					submitToLocalDatabase();
 				}
 			} else {
+				$scope.modal.error = true;
 				$scope.modal.remote.error = true;
 				console.log(response);
 				console.log("Result: ", response.result);
 				console.log("Error: ", response.error);
 			}
 		}).error(function(error) {
+			$scope.modal.error = true;
 			$scope.modal.remote.spinner = false;
 			$scope.modal.remote.error = true;
 			console.log("Error: ", error);
 		});
 	}
 
+// Check to see if the speaker needs to be added to the database
 	var checkForNewSpeaker = function() {
 		if (!$scope.newSpeaker) {
 			// Send the sermon info the remote database
@@ -224,10 +307,12 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 					}
 					submitToRemoteDatabase();
 				} else {
+					$scope.modal.error = true;
 					$scope.modal.newSpeaker.error = true;
 					console.log("Error: ", response.error);
 				}
 			}).error(function(error) {
+				$scope.modal.error = true;
 				$scope.modal.newSpeaker.spinner = false;
 				$scope.modal.newSpeaker.error = true;
 				console.log("Error: ", error);
@@ -235,6 +320,7 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 		}
 	}
 
+// Prepare the audio for the internet
 	var convertAudioFile = function(options, callback) {
 		$scope.modal.convert.text = true;
 		$scope.modal.convert.spinner = true;
@@ -246,6 +332,7 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 				$http({method: "GET", url: apiRoot + "percent.php", params: response}).success(function(response) {
 					$scope.modal.convert.percent = parseInt(response.number);
 				}).error(function(error) {
+					$scope.modal.error = true;
 					$scope.modal.convert.spinner = false;
 					$scope.modal.convert.error = true;
 					console.log("Error: ", error);
@@ -260,210 +347,49 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 					$scope.modal.convert.success = true;
 					checkForNewSpeaker();
 				} else {
+					$scope.modal.error = true;
 					$scope.modal.convert.spinner = false;
 					$scope.modal.convert.error = true;
 				}
-				$http({method: "GET", url: apiRoot + "percent.php", params: {remove_id: options.id}});
+				$http({method: "GET", url: apiRoot + "percent.php", params: {remove_id: options.id}}).success(function(response) {
+					console.log("Percent Deleted");
+					console.log("Response: ", response);
+					console.log("ID: ", options.id);
+				}).error(function() {
+					console.log("Percent Delete Error");
+				});
 			}).error(function(error) {
 				$interval.cancel($scope.modal.convert.timer);
+				$scope.modal.error = true;
 				$scope.modal.convert.spinner = false;
 				$scope.modal.convert.error = true;
 				console.log("Error: ", error);
 				$http({method: "GET", url: apiRoot + "percent.php", params: {remove_id: id}});
 			});
 		}).error(function(error) {
+			$scope.modal.error = true;
 			$scope.modal.convert.spinner = false;
 			$scope.modal.convert.error = true;
 			console.log("Error: ", error);
 		});
 	}
-
-	$scope.bookChange = function() {
-		var params = {
-			method: 'bookChange',
-			book: $scope.bible.book.bnum,
-		}
-		$http({method: "get", url: apiRoot + "bible.php", params: params}).success(function(response) {
-			arrayFill($scope.bible.startChaps, 1, response.chapNum);
-			arrayFill($scope.bible.endChaps, 1, response.chapNum);
-			arrayFill($scope.bible.startVerses, 1, response.verseNum);
-			arrayFill($scope.bible.endVerses, 1, response.verseNum);
-			$scope.bible.startChap = $scope.bible.startChaps[0];
-			$scope.bible.endChap = $scope.bible.endChaps[0];
-			$scope.bible.startVerse = $scope.bible.startVerses[0];
-			$scope.bible.endVerse = $scope.bible.endVerses[$scope.bible.endVerses.length - 1];
-			$scope.bible.text = response.verseText;
-		}).error(function(error) {
-			console.log("Could not get bible info from database.");
-			console.log("Error: ", error);
-		});
-	}
-
-	$scope.startChapChange = function() {
-		var params = {
-			method: "chapterChange",
-			book:					$scope.bible.book.bnum,
-			startChapter:	$scope.bible.startChap,
-			startVerse:		$scope.bible.startVerse,
-			endChapter:		$scope.bible.endChap,
-			endVerse:			$scope.bible.endVerse,
-		}
-		$http({method: "get", url: apiRoot + "bible.php", params: params}).success(function(response) {
-			if ($scope.bible.endChap < $scope.bible.startChap) {
-				$scope.bible.endChap = $scope.bible.startChap;
-				arrayFill($scope.bible.endChaps, $scope.bible.startChap);
-				arrayFill($scope.bible.endVerses, 1, response.startVerseNum);
-				$scope.bible.endVerse = parseInt(response.startVerseNum);
-			} else if ($scope.bible.endChap > $scope.bible.startChap) {
-				arrayFill($scope.bible.endChaps, $scope.bible.startChap);
-				arrayFill($scope.bible.endVerses, 1);
-			}
-			arrayFill($scope.bible.startVerses, 1, response.startVerseNum);
-			$scope.bible.startVerse = 1;
-			$scope.bible.text = response.verseText
-		}).error(function(error) {
-			console.log("Could not get bible info from database.");
-			console.log("Error: ", error);
-		});
-	}
-
-	$scope.startVerseChange = function() {
-		var params = {
-			method: "verseChange",
-			book:					$scope.bible.book.bnum,
-			startChapter:	$scope.bible.startChap,
-			startVerse:		$scope.bible.startVerse,
-			endChapter:		$scope.bible.endChap,
-			endVerse:			$scope.bible.endVerse,
-		}
-		$http({method: "get", url: apiRoot + "bible.php", params: params}).success(function(response) {
-			if ($scope.bible.endChap == $scope.bible.startChap) {
-				if ($scope.bible.endVerse < $scope.bible.startVerse) {
-					$scope.bible.endVerse = $scope.bible.startVerse;
-				}
-				arrayFill($scope.bible.endVerses, $scope.bible.startVerse);
-			} else {
-				if ($scope.bible.endVerses[0] > 1) {
-					arrayFill($scope.bible.endVerses, 1);
-				}
-			}
-			$scope.bible.text = response.verseText;
-		}).error(function(error) {
-			console.log("Could not get bible info from database.");
-			console.log("Error: ", error);
-		});
-	}
-
-	$scope.endChapChange = function() {
-		var params = {
-			method: 'chapterChange',
-			book:					$scope.bible.book.bnum,
-			startChapter:	$scope.bible.startChap,
-			startVerse:		$scope.bible.startVerse,
-			endChapter:		$scope.bible.endChap,
-			endVerse:			$scope.bible.endVerse,
-		}
-		$http({method: "get", url: apiRoot + "bible.php", params: params}).success(function(response) {
-			if ($scope.bible.endChap == $scope.bible.startChap) {
-				arrayFill($scope.bible.endVerses, $scope.bible.startVerse, response.endVerseNum);
-			} else if ($scope.bible.endChap > $scope.bible.startChap) {
-				arrayFill($scope.bible.endVerses, 1, response.endVerseNum);
-			}
-			$scope.bible.endVerse = parseInt(response.endVerseNum);
-			$scope.bible.text = response.verseText;
-		}).error(function(error) {
-			console.log("Could not get bible info from database.");
-			console.log("Error: ", error);
-		});
-	}
-
-	$scope.endVerseChange = function() {
-		var params = {
-			method: "verseChange",
-			book:					$scope.bible.book.bnum,
-			startChapter:	$scope.bible.startChap,
-			startVerse:		$scope.bible.startVerse,
-			endChapter:		$scope.bible.endChap,
-			endVerse:			$scope.bible.endVerse,
-		}
-		$http({method: "get", url: apiRoot + "bible.php", params: params}).success(function(response) {
-			$scope.bible.text = response.verseText;
-		}).error(function(error) {
-			console.log("Could not get bible info from database.");
-			console.log("Error: ", error);
-		});
-	}
-
-
-//--------------------------------------------------------------------------------
-//	Get data from Database
-//--------------------------------------------------------------------------------
-
-	// Get list of speakers from the database and setup autocomplete
-		$http.get(apiRoot + "speakers.php").success(function(response) {
-			$scope.speakers = response;
-			$( ".speaker.autofill" ).autocomplete({
-				minLength: 0,
-				source: $scope.speakers,
-				focus: function( event, ui ) {
-					$scope.name = ui.item.value;
-					return false;
-				},
-				select: function( event, ui ) {
-					$scope.speaker = ui.item;
-					$scope.speakerTitle = ui.item.title_id;
-					$scope.$apply();
-					return false;
-				}
-			}).data( "ui-autocomplete" )._renderItem = function( ul, item ) {
-				return $( "<li>" )
-				.append( "<a>" + item.label + "</a>" )
-				.appendTo( ul );
-			};
-		}).error(function(error) {
-			console.log("Could not get speaker list from database.");
-			console.log("Error: ", error);
-		});
-
-	// Get list of sermon types from the database to fill the select menu
-	$http.get(apiRoot + "type.php").success(function(response) {
-		// Store the response in a scope variable to fill the select menu
-		$scope.types = response;
-		// Select the first option by default
-		$scope.type = $scope.types[0];
-	}).error(function(error) {
-		console.log("Could not get sermon types from database.");
-		console.log("Error: ", error);
-	});
-
-	$http({method: "GET", url: apiRoot + "bible.php", params: {method: 'init'}}).success(function(response) {
-		$scope.bible.books = response.bookList;
-		$scope.bible.book = $scope.bible.books[0];
-		arrayFill($scope.bible.startChaps, 1, response.chapNum);
-		arrayFill($scope.bible.endChaps, 1, response.chapNum);
-		arrayFill($scope.bible.startVerses, 1, response.verseNum);
-		arrayFill($scope.bible.endVerses, 1, response.verseNum);
-		$scope.bible.startChap = $scope.bible.startChaps[0];
-		$scope.bible.endChap = $scope.bible.endChaps[0];
-		$scope.bible.startVerse = $scope.bible.startVerses[0];
-		$scope.bible.endVerse = $scope.bible.endVerses[$scope.bible.endVerses.length - 1];
-		$scope.bible.text = response.verseText;
-	}).error(function(error) {
-		console.log("Could not get Bible from database.");
-		console.log("Error: ", error);
-	});
-
-//--------------------------------------------------------------------------------
-//	Submit the form
-//--------------------------------------------------------------------------------
+/*
+$scope.submitForm = function() {
+	$scope.modal.visible = true;
+	$scope.modal.complete = true;
+};
+*/
+// Submit the form and upload the audio file
 	$scope.submitForm = function() {
-		// Make sure all needed data exists
 		$scope.modal.visible = true;
 
+// Make sure there is no missing data
+	// Check for a name
 		if ($scope.name == "") {
 			$scope.modal.info.error = true;
 			$scope.modal.info.name = true;
 		} else {
+	// Check to see if it is a new name or a current speaker
 			if (!$scope.speaker || !$scope.speaker.value || $scope.name != $scope.speaker.value) {
 				var speaker = $filter("filter")($scope.speakers, {value: $scope.name});
 				if (speaker.length == 1) {
@@ -473,28 +399,41 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 				}
 			}
 		}
+	// Make sure a sermon title exists
 		if ($scope.sermonTitle == "") {
 			$scope.modal.info.error = true;
 			$scope.modal.info.title = true;
 		}
+	// Set special info to null if it empty
 		if ($scope.specialInfo == "") {
 			$scope.specialInfo = null;
 		}
+	// Check for a sermon file
 		if ($scope.sermon == undefined) {
 			$scope.modal.info.error = true;
 			$scope.modal.info.file = true;
 		} else if ($scope.modal.info.fileSize) {
+	// Make sure the file is not too big
 			$scope.modal.info.error = true;
 		}
+	// Proceed if there are no errors
 		if (!$scope.modal.info.error) {
+			// Set the new file name for the remote database and converted file
 			var tempName = $scope.textDate + "-" + $filter("date")($scope.date, "EEE").toLowerCase() + "-" + $scope.service.value;
-// Set the local and remote file names
 
+			// Store the current name for the local database and the temp name / new name for the uploaded and converted audio files respectively
 			$scope.sermonInfo = {
 				name: tempName + ".tmp",
 				new_name: tempName + ".mp3",
 				old_name: $scope.fileName,
 			};
+
+	// Submit the form to upload the file
+	// The file is the only element that is submitted in the form
+	// The rest of the information is sent via ajax
+	// The file upload uses jQuery.form.js plugin by M Alsup at http://malsup.com/jquery/form/
+	//	to upload the file via ajax in browsers that support it and use another method for browsers that don't
+	// Using this plugin enables the file upload progress bar in browsers that support ajax file upload
 			$('form').ajaxSubmit({
 				url: "php/api/upload.php",
 				method: "post",
@@ -521,6 +460,7 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 				},
 				error: function(error) {
 					console.log(error);
+					$scope.modal.error = true;
 					$scope.modal.upload.error = true;
 					$scope.modal.upload.progess = false;
 				},
@@ -534,9 +474,194 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 	}
 
 //--------------------------------------------------------------------------------
+// Bible Verse Picker functions
+//--------------------------------------------------------------------------------
+
+// When the book changes
+	$scope.bookChange = function() {
+		var params = {
+			method:	'bookChange',
+			book:		$scope.bible.book.bnum,
+		}
+		$http({method: "get", url: apiRoot + "bible.php", params: params}).success(function(response) {
+			arrayFill($scope.bible.startChaps, 1, response.chapNum);
+			arrayFill($scope.bible.endChaps, 1, response.chapNum);
+			arrayFill($scope.bible.startVerses, 1, response.verseNum);
+			arrayFill($scope.bible.endVerses, 1, response.verseNum);
+			$scope.bible.startChap = $scope.bible.startChaps[0];
+			$scope.bible.endChap = $scope.bible.endChaps[0];
+			$scope.bible.startVerse = $scope.bible.startVerses[0];
+			$scope.bible.endVerse = $scope.bible.endVerses[$scope.bible.endVerses.length - 1];
+			$scope.bible.text = response.verseText;
+		}).error(function(error) {
+			console.log("Could not get bible info from database.");
+			console.log("Error: ", error);
+		});
+	}
+
+// When the start chapter changes
+	$scope.startChapChange = function() {
+		var params = {
+			method: 			"chapterChange",
+			book:					$scope.bible.book.bnum,
+			startChapter:	$scope.bible.startChap,
+			startVerse:		$scope.bible.startVerse,
+			endChapter:		$scope.bible.endChap,
+			endVerse:			$scope.bible.endVerse,
+		}
+		$http({method: "get", url: apiRoot + "bible.php", params: params}).success(function(response) {
+			if ($scope.bible.endChap < $scope.bible.startChap) {
+				$scope.bible.endChap = $scope.bible.startChap;
+				arrayFill($scope.bible.endChaps, $scope.bible.startChap);
+				arrayFill($scope.bible.endVerses, 1, response.startVerseNum);
+				$scope.bible.endVerse = parseInt(response.startVerseNum);
+			} else if ($scope.bible.endChap > $scope.bible.startChap) {
+				arrayFill($scope.bible.endChaps, $scope.bible.startChap);
+				arrayFill($scope.bible.endVerses, 1);
+			}
+			arrayFill($scope.bible.startVerses, 1, response.startVerseNum);
+			$scope.bible.startVerse = 1;
+			$scope.bible.text = response.verseText
+		}).error(function(error) {
+			console.log("Could not get bible info from database.");
+			console.log("Error: ", error);
+		});
+	}
+
+// When the start verse changes
+	$scope.startVerseChange = function() {
+		var params = {
+			method: 			"verseChange",
+			book:					$scope.bible.book.bnum,
+			startChapter:	$scope.bible.startChap,
+			startVerse:		$scope.bible.startVerse,
+			endChapter:		$scope.bible.endChap,
+			endVerse:			$scope.bible.endVerse,
+		}
+		$http({method: "get", url: apiRoot + "bible.php", params: params}).success(function(response) {
+			if ($scope.bible.endChap == $scope.bible.startChap) {
+				if ($scope.bible.endVerse < $scope.bible.startVerse) {
+					$scope.bible.endVerse = $scope.bible.startVerse;
+				}
+				arrayFill($scope.bible.endVerses, $scope.bible.startVerse);
+			} else {
+				if ($scope.bible.endVerses[0] > 1) {
+					arrayFill($scope.bible.endVerses, 1);
+				}
+			}
+			$scope.bible.text = response.verseText;
+		}).error(function(error) {
+			console.log("Could not get bible info from database.");
+			console.log("Error: ", error);
+		});
+	}
+
+// When the end chapter changes
+	$scope.endChapChange = function() {
+		var params = {
+			method: 			'chapterChange',
+			book:					$scope.bible.book.bnum,
+			startChapter:	$scope.bible.startChap,
+			startVerse:		$scope.bible.startVerse,
+			endChapter:		$scope.bible.endChap,
+			endVerse:			$scope.bible.endVerse,
+		}
+		$http({method: "get", url: apiRoot + "bible.php", params: params}).success(function(response) {
+			if ($scope.bible.endChap == $scope.bible.startChap) {
+				arrayFill($scope.bible.endVerses, $scope.bible.startVerse, response.endVerseNum);
+			} else if ($scope.bible.endChap > $scope.bible.startChap) {
+				arrayFill($scope.bible.endVerses, 1, response.endVerseNum);
+			}
+			$scope.bible.endVerse = parseInt(response.endVerseNum);
+			$scope.bible.text = response.verseText;
+		}).error(function(error) {
+			console.log("Could not get bible info from database.");
+			console.log("Error: ", error);
+		});
+	}
+
+// When the end verse changes
+	$scope.endVerseChange = function() {
+		var params = {
+			method: 			"verseChange",
+			book:					$scope.bible.book.bnum,
+			startChapter:	$scope.bible.startChap,
+			startVerse:		$scope.bible.startVerse,
+			endChapter:		$scope.bible.endChap,
+			endVerse:			$scope.bible.endVerse,
+		}
+		$http({method: "get", url: apiRoot + "bible.php", params: params}).success(function(response) {
+			$scope.bible.text = response.verseText;
+		}).error(function(error) {
+			console.log("Could not get bible info from database.");
+			console.log("Error: ", error);
+		});
+	}
+
+
+//--------------------------------------------------------------------------------
+//	Get initial data from the database
+//--------------------------------------------------------------------------------
+
+// Get list of speakers from the database and setup the auto fill
+		$http.get(apiRoot + "speakers.php").success(function(response) {
+			$scope.speakers = response;
+			$( ".speaker.autofill" ).autocomplete({
+				minLength: 0,
+				source: $scope.speakers,
+				focus: function( event, ui ) {
+					$scope.name = ui.item.value;
+					return false;
+				},
+				select: function( event, ui ) {
+					$scope.speaker = ui.item;
+					$scope.speakerTitle = ui.item.title_id;
+					$scope.$apply();
+					return false;
+				}
+			}).data( "ui-autocomplete" )._renderItem = function( ul, item ) {
+				return $( "<li>" )
+				.append( "<a>" + item.label + "</a>" )
+				.appendTo( ul );
+			};
+		}).error(function(error) {
+			console.log("Could not get speaker list from database.");
+			console.log("Error: ", error);
+		});
+
+// Get list of sermon types from the database to fill the select menu
+	$http.get(apiRoot + "type.php").success(function(response) {
+		$scope.types = response;
+		$scope.type = $scope.types[0];
+	}).error(function(error) {
+		console.log("Could not get sermon types from database.");
+		console.log("Error: ", error);
+	});
+
+// Initialize the Bible verse picker
+	$http({method: "GET", url: apiRoot + "bible.php", params: {method: 'init'}}).success(function(response) {
+		$scope.bible.books = response.bookList;
+		$scope.bible.book = $scope.bible.books[0];
+		arrayFill($scope.bible.startChaps, 1, response.chapNum);
+		arrayFill($scope.bible.endChaps, 1, response.chapNum);
+		arrayFill($scope.bible.startVerses, 1, response.verseNum);
+		arrayFill($scope.bible.endVerses, 1, response.verseNum);
+		$scope.bible.startChap = $scope.bible.startChaps[0];
+		$scope.bible.endChap = $scope.bible.endChaps[0];
+		$scope.bible.startVerse = $scope.bible.startVerses[0];
+		$scope.bible.endVerse = $scope.bible.endVerses[$scope.bible.endVerses.length - 1];
+		$scope.bible.text = response.verseText;
+	}).error(function(error) {
+		console.log("Could not get Bible from database.");
+		console.log("Error: ", error);
+	});
+
+//--------------------------------------------------------------------------------
 //	Watch for changes
 //--------------------------------------------------------------------------------
 
+// Watch for the date object to change and set the 
+//	date Text to match the date of the date object
 	$scope.$watch("date", function(date) {
 		$scope.textDate = $filter("date")($scope.date, "yyyy-MM-dd");
 	});

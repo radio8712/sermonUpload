@@ -9,7 +9,8 @@ $myLame = new Lame($localdb);
 if ($_GET) extract($_GET);
 
 if (isset($remove_id)) {
-	remove_id($remove_id);
+	$delete = $myLame->remove_id($remove_id);
+	echo json_encode(array("status" => $delete));
 } else {
 	$percent = $myLame->get_percent($id);
 	$percent = json_encode($percent);

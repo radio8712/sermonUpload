@@ -11,13 +11,13 @@
 <!-- 		<link type="text/css" rel="stylesheet" href="./css/main.css" /> -->
 
 <!-- Scripts -->
-		<script type="text/javascript" src="./js/jquery.js"></script>
-		<script type="text/javascript" src="./js/jquery-ui.js"></script>
-		<script type="text/javascript" src="./js/jquery.form.js"></script>
-		<script type="text/javascript" src="./js/less.js"></script>
-		<script type="text/javascript" src="./js/angular.js"></script>
-		<script type="text/javascript" src="./js/angular-sanitize.js"></script>
-		<script type="text/javascript" src="./js/date.js"></script>
+		<script type="text/javascript" src="./js/plugins/jquery/jquery.js"></script>
+		<script type="text/javascript" src="./js/plugins/jquery/jquery-ui.js"></script>
+		<script type="text/javascript" src="./js/plugins/jquery/jquery.form.js"></script>
+		<script type="text/javascript" src="./js/plugins/less/less.js"></script>
+		<script type="text/javascript" src="./js/plugins/angular/angular.js"></script>
+		<script type="text/javascript" src="./js/plugins/angular/angular-sanitize.js"></script>
+		<script type="text/javascript" src="./js/plugins/angular/date.js"></script>
 		<script type="text/javascript" src="./js/main.js"></script>
 		<script type="text/javascript" src="./js/controller.js"></script>
 		<script type="text/javascript" src="./js/service.js"></script>
@@ -194,9 +194,10 @@ The File Upload and Conversion steps also have progress bars.
 				<p class="text" data-ng-show="modal.local.text">Sending sermon information to Church server</p>
 			</div>
 
-			<div class="complete">
-				<span class="fa" data-ng-class="{spinner: modal.local.spinner, 'fa-check-circle green': modal.local.success, 'fa-times-circle red': modal.local.error}"></span>
-				<p class="text" data-ng-show="modal.local.text">The sermon has successfully been submitted.</p>
+			<div class="complete" data-ng-show="modal.complete">
+				<span class="fa fa-check-circle green"></span>
+				<p class="text">The sermon has successfully been submitted.</p>
+				<button data-ng-click="goToSermonsPage()">View Sermons Page</button>
 			</div>
 
 		</div>
