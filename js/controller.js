@@ -1,9 +1,12 @@
-app.controller("Form", function($scope, $filter, $http, $interval) {
+app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 
 //--------------------------------------------------------------------------------
 //	Init Variables
 //--------------------------------------------------------------------------------
-	var apiRoot = "/sermonUpload/php/api/";
+	var apiRoot = "/php/api/";
+	if ($location.host() == "localhost") {
+		apiRoot = "/sermonUpload" + apiRoot;
+	}
 
 	$scope.bible = {
 		books: [],
@@ -137,8 +140,80 @@ app.controller("Form", function($scope, $filter, $http, $interval) {
 		}
 	}
 
-	var checkForNewSpeaker = function() {
+	var submitToLocalDatabase = function() {
 		
+	}
+
+	var submitToRemoteDatabase = function() {
+		var sermon = {
+			method: "addSermon",
+			date: $filter("date")($scope.date, "yyyy-MM-dd"),
+			service: $scope.service.value,
+			speaker: $scope.speaker.speaker_id,
+			sermon_title: $scope.title,
+			book: $scope.bible.book.bnum,
+			start_chap: $scope.bible.startChap,
+			start_verse: $scope.bible.startVerse,
+			end_chap: $scope.bible.endChap,
+			end_verse: $scope.bible.endVerse,
+			sermon_type: $scope.type.type_id,
+			special_info: $scope.special_info,
+			remote_filename: $scope.sermonInfo.new_name,
+			local_filename: $scope.sermonInfo.old_name,
+		}
+		// This app is meant to be run from an intranet when in production
+		// If localOnly is set to "true" this will only update the
+		// local database (the database the server is running on
+		// if set to "false" it will also update a database setup as the remote database
+		if (localOnly) {
+			submitToLocalDatabase();
+		} else {
+			$http({method: "GET", url: apiRoot + "remote.php"}).success(function(response) {
+				if (!response.error) {
+					$scope.modal.remote.success = true;
+					submitToLocalDatabase();
+				} else {
+					$scope.modal.remote.error = true;
+					console.log("Error: ", response.error);
+				}
+			}).error(function(error) {
+				$scope.modal.remote.error = true;
+				console.log("Error: ", error);
+			}).always(function() {
+				$scope.modal.remote.spinner = false;
+			});
+		}
+	}
+
+	var checkForNewSpeaker = function() {
+		if (!$scope.newSpeaker) {
+			// Send the sermon info the remote database
+			submitToRemoteDatabase();
+		} else {
+			$scope.modal.newSpeaker.text = true;
+			$scope.modal.newSpeaker.spinner = true;
+			var speaker = {
+				method: "saveNewSpeaker",
+				title: $scope.speakerTitle.value,
+				name: $scope.name,
+			};
+			$http({method: "GET", url: apiRoot + "newSpeaker.php", params: speaker}).success(function(resonse) {
+				if (!response.error) {
+					$scope.modal.newSpeaker.success = true;
+					// Save the id to the speaker and send the sermon info the remote database
+					$scope.speaker.speaker_id = response.speaker_id;
+					submitToRemoteDatabase();
+				} else {
+					$scope.modal.newSpeaker.error = true;
+					console.log("Error: ", response.error);
+				}
+			}).error(function(error) {
+				$scope.modal.newSpeaker.error = true;
+				console.log("Error: ", error);
+			}).always(function() {
+				$scope.modal.newSpeaker.spinner = false;
+			});
+		}
 	}
 
 	var convertAudioFile = function(options, callback) {
@@ -177,6 +252,8 @@ app.controller("Form", function($scope, $filter, $http, $interval) {
 				$scope.modal.convert.spinner = false;
 				$scope.modal.convert.error = true;
 				console.log("Error: ", error);
+			}).always(function() {
+				$http({method: "GET", url: apiRoot + "percent.php", params: {remove_id: id}});
 			});
 		}).error(function(error) {
 			$scope.modal.convert.spinner = false;
@@ -308,30 +385,30 @@ app.controller("Form", function($scope, $filter, $http, $interval) {
 //--------------------------------------------------------------------------------
 
 	// Get list of speakers from the database and setup autocomplete
-	$http.get(apiRoot + "speakers.php").success(function(response) {
-		$scope.speakers = response;
-		$( ".speaker.autofill" ).autocomplete({
-			minLength: 0,
-			source: $scope.speakers,
-			focus: function( event, ui ) {
-				$scope.name = ui.item.value;
-				return false;
-			},
-			select: function( event, ui ) {
-				$scope.speaker = ui.item;
-				$scope.speakerTitle = ui.item.title_id;
-				$scope.$apply();
-				return false;
-			}
-		}).data( "ui-autocomplete" )._renderItem = function( ul, item ) {
-			return $( "<li>" )
-			.append( "<a>" + item.label + "</a>" )
-			.appendTo( ul );
-		};
-	}).error(function(error) {
-		console.log("Could not get speaker list from database.");
-		console.log("Error: ", error);
-	});
+		$http.get(apiRoot + "speakers.php").success(function(response) {
+			$scope.speakers = response;
+			$( ".speaker.autofill" ).autocomplete({
+				minLength: 0,
+				source: $scope.speakers,
+				focus: function( event, ui ) {
+					$scope.name = ui.item.value;
+					return false;
+				},
+				select: function( event, ui ) {
+					$scope.speaker = ui.item;
+					$scope.speakerTitle = ui.item.title_id;
+					$scope.$apply();
+					return false;
+				}
+			}).data( "ui-autocomplete" )._renderItem = function( ul, item ) {
+				return $( "<li>" )
+				.append( "<a>" + item.label + "</a>" )
+				.appendTo( ul );
+			};
+		}).error(function(error) {
+			console.log("Could not get speaker list from database.");
+			console.log("Error: ", error);
+		});
 
 	// Get list of sermon types from the database to fill the select menu
 	$http.get(apiRoot + "type.php").success(function(response) {
@@ -367,9 +444,7 @@ app.controller("Form", function($scope, $filter, $http, $interval) {
 	$scope.submitForm = function() {
 		// Make sure all needed data exists
 		$scope.modal.visible = true;
-		
 
-/*
 		if ($scope.name == "") {
 			$scope.modal.info.error = true;
 			$scope.modal.info.name = true;
@@ -390,7 +465,6 @@ app.controller("Form", function($scope, $filter, $http, $interval) {
 		if ($scope.specialInfo == "") {
 			$scope.specialInfo = null;
 		}
-*/
 		if ($scope.sermon == undefined) {
 			$scope.modal.info.error = true;
 			$scope.modal.info.file = true;
@@ -398,10 +472,13 @@ app.controller("Form", function($scope, $filter, $http, $interval) {
 			$scope.modal.info.error = true;
 		}
 		if (!$scope.modal.info.error) {
-			var tempName = $scope.textDate + $filter("date")($scope.date, "EEE").toLowerCase() + $scope.service.value;
+			var tempName = $scope.textDate + "-" + $filter("date")($scope.date, "EEE").toLowerCase() + "-" + $scope.service.value;
+// Set the local and remote file names
+
 			$scope.sermonInfo = {
 				name: tempName + ".tmp",
 				new_name: tempName + ".mp3",
+				old_name: "",
 			};
 			$('form').ajaxSubmit({
 				url: "php/api/upload.php",

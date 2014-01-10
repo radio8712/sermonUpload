@@ -1,38 +1,35 @@
 <?php
+// Import the MySQL library this file uses
 require_once("../mysql/Lame.php");
 
-
-
-/*
-$id = 24;
-$name = "2013-11-14.tmp";
-$upload_dir = "../../uploads";
-$new_name = "11-14-2013AM.mp3";
-*/
+// Create a connection to the database
 $myLame = new Lame($localdb);
 
+// Get the data from the POST or GET request
 if ($_POST) extract($_POST);
 else if ($_GET) extract($_GET);
 
-$error = 0;	// Set error flag to false
-//list($upload_dir, $name) = explode("/", $name);	// Split the upload directory from the current file name
-$name = str_replace(" ", "\ ",$name);			// Add slashes to any spaces in the file name
+// Set error flag to false
+$error = 0;
 
 // Lame instruction for development use
 $lame = "/opt/local/bin/lame --mp3input -a -b 64 ".$upload_dir.$name." ".$upload_dir.$new_name;
 // Lame instruction for deployment use
 /* $lame = "/src/lame/frontend/lame --mp3input -a -b 64 ".$upload_dir.$name." ".$upload_dir.$new_name; */
 
-// Delete the temporary file
+// Command to delete the temporary file
 $del_file = "rm -f ".$upload_dir.$name;
 
 
-// Convert the file with lame
-
+// Use a regex to parse the percentage of the conversion
 $yourParserRegex = "/[0-9]{1,3}%/";
-$handle  = popen($lame . ' 2>&1', 'r');
+// Initialize the percentage
 $percent = 0;
 
+// Convert the file with lame
+$handle  = popen($lame . ' 2>&1', 'r');
+
+// Loop over the results to get the percent complete
 while (!feof($handle))
 {
 	$line = stream_get_line($handle, 2048, "[A[A[A");
@@ -40,16 +37,23 @@ while (!feof($handle))
 
 	$percent = explode("%", $data[0]);
 	$percent = $percent[0];
+	// Store the percentage in the database
+	// This allows the user to get a real time progress bar in the browser
 	$myLame->set_percent($id, $percent);
 }
 
 if ($percent == 100) {
-	$error = 0;
+	// Delete the temporary file if the lame conversion was successful
+	exec ($del_file, $output, $return);
+	if ($return != 0) {
+		// Set the error code to 2 if the file did not delete
+		$error = 2;
+	}
 } else {
+	// Set the error code to 1 if the lame conversion did not reach 100%
 	$error = 1;
 }
-
-$output = array("status" => $error);
-echo json_encode($output);
+// JSON encode the output and echo it to the caller
+echo json_encode(array("status" => $error));
 
 ?>

@@ -14,6 +14,7 @@ class Speaker {
 	function add_new_speaker($title_id, $name) {
 		$query = $this->db->prepare("INSERT INTO speakers (title_id, speaker) VALUES (:title_id, :name)");
 		$query->execute(array(":title_id" => $title_id, ":name" => $name));
+		return $query->errorCode();
 	}
 
 	function get_speakers() {
