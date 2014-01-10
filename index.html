@@ -2,13 +2,15 @@
 <html ng-app="SermonUploader">
 	<head>
 		<title>Sermon Info Update Page</title> <!-- Page Title -->
-<!-- 		<meta charset="UTF-8"> -->
+
 		<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+<!-- Stylesheets -->
 		<link type="text/css" rel="stylesheet"			href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
 		<link type="text/css" rel="stylesheet"			href="./css/flick/jquery-ui.css" />
 		<link type="text/css" rel="stylesheet/less" href="./css/main.less" />
 <!-- 		<link type="text/css" rel="stylesheet" href="./css/main.css" /> -->
 
+<!-- Scripts -->
 		<script type="text/javascript" src="./js/jquery.js"></script>
 		<script type="text/javascript" src="./js/jquery-ui.js"></script>
 		<script type="text/javascript" src="./js/jquery.form.js"></script>
@@ -25,14 +27,18 @@
 	<body ng-controller="Form">
 		<div class="container">
 		<h1>Sermon Info Update Page</h1>
-		<pre>{{speaker}}</pre>
+
+<!-- Placeholder div for Bible verses -->
 			<div class="bible" ng-bind-html="bible.text"></div>
 			<div class="form">
-	
+
+<!-- Date -->
 				<div class="clear">
 					<label>Date</label>
 					<input type="text" placeholder="mm/dd/yyyy" data-ng-model="date" data-ui-date="dateOptions">
 				</div>
+
+<!-- Service M, A, E for Morning, Afternoon, Evening -->
 				<div class="clear">
 					<label>Service</label>
 					<div class="select">
@@ -40,18 +46,25 @@
 						<span class="fa fa-angle-down"></span>
 					</div>
 				</div>
+
+<!-- Speaker (Both the speaker's title and name) -->
+<!-- Title values are limited to Pastor, Missionary, and Evangelist -->
 				<div class="clear">
 					<label>Speaker</label>
 					<div class="select short">
 						<select data-ng-model="speakerTitle" data-ng-options="title.value as title.option for title in speakerTitles"></select>
 						<span class="fa fa-angle-down"></span>
 					</div>
-					<input type="text" class="short speaker autofill" placeholder="Name" data-ng-model="name">
+					<input type="text" class="short speaker autofill" placeholder="Name" data-ng-model="name" data-tc-title-fix="speakerTitle">
 				</div>
+
+<!-- Sermon Title (The name of the sermon)-->
 				<div class="clear extra">
 					<label>Sermon Title</label>
 					<input type="text" placeholder="Sermon Title" data-ng-model="sermonTitle">
 				</div>
+
+<!-- Text (Bible reference used for the sermon) -->
 				<div class="clear">
 					<label>Text</label>
 					<div class="select book">
@@ -78,6 +91,8 @@
 						<span class="fa fa-angle-down"></span>
 					</div>
 				</div>
+
+<!-- Sermon Type (Category) -->
 				<div class="clear">
 					<label>Sermon Type</label>
 					<div class="select">
@@ -85,14 +100,18 @@
 						<span class="fa fa-angle-down"></span>
 					</div>
 				</div>
+
+<!-- Special Info (Information about the speaker or service that will help reference it later) -->
 				<div class="clear extra">
 					<label>Special Info</label>
 					<input type="text" placeholder="Special Information" data-ng-model="specialInfo">
 				</div>
+
+<!-- File (The audio recording in MP3 of the sermon) -->
 				<div class="clear">
 					<form enctype="multipart/form-data">
 						<label>Filename</label>
-						<input type="file" name="file" accept="audio/mp3" data-ng-model="sermon" data-tc-file="modal">
+						<input type="file" name="file" accept="audio/mp3" data-ng-model="sermon" data-tc-file="modal" data-file-name="fileName">
 						<button data-tc-upload-hide>Choose A Sermon To Upload</button>
 						<div class="clear extra"></div>
 						<label></label>
@@ -101,10 +120,10 @@
 					</form>
 				</div>
 
+<!-- Instructions -->
 				<p>
 					Press the "Upload The Sermon" button to upload the sermon to the internet.<br>
 					Press the "Reset The Form" button to clear out the form.<br>
-					{{status}}
 				</p>
 			</div>
 		</div>
@@ -117,15 +136,16 @@
 
 <!--
 --------------------------------------------------------------------------------
-Class hidden is hidden by css when the page is loaded
-Each section contains a "success", "error", and "processing" image that can be displayed to show
-the status of that section at any time
+This section is hidden by default until the "Upload The Sermon" button is 
+pressed. Each section has a success, error, and processing spinner that can 
+be displayed and hidden to show the progress.
+The File Upload and Conversion steps also have progress bars.
 --------------------------------------------------------------------------------
 -->
 
 
 		<div class="modal" data-ng-show="modal.visible" data-tc-modal="modal">
-			<!-- Display this section when more information is needed in the form -->
+<!-- Display this section when more information is needed in the form -->
 			<div class="moreInfo" data-ng-show="modal.info.error">
 				<p data-ng-show="modal.info.error && (modal.info.name || modal.info.title || modal.info.file || modal.info.fileSize)">
 					Please correct the following information before proceeding:
@@ -136,57 +156,50 @@ the status of that section at any time
 				<p data-ng-show="modal.info.error && modal.info.fileSize"><span class="fa fa-asterisk red"></span> The selected file is too large. Please select a file smaller than 100MB.</p>
 			</div>
 
-			<!-- Display this section when an error has occured and the user needs to start over -->
+<!-- Display this section when an error has occured and the user needs to start over -->
 			<div class="error" data-ng-show="modal.error">
 				<span class="fa" data-ng-class="{'fa-times-circle red': modal.error}"></span>
 				<p class="text">There was an error in the submission process. Please try again.</p>
 			</div>
 
-			<!-- Display this section when the file starts the upload process -->
+<!-- Display this section when the file starts the upload process -->
 			<div class="upload">
 				<span class="fa" data-ng-class="{spinner: modal.upload.spinner, 'fa-check-circle green': modal.upload.success, 'fa-times-circle red': modal.upload.error}"></span>
 				<p class="text" data-ng-show="modal.upload.text">Uploading sermon audio to Church server</p>
 				<div data-ng-show="modal.upload.progress" data-tc-progress-bar="modal.upload.percent"></div>
-<!--
-				<div class="progress" data-ng-show="modal.upload.progress">
-					<div class="bar" style="width: {{modal.upload.percent}}%;"></div>
-					<div class="percent">{{modal.upload.percent}}%</div>
-				</div>
--->
 			</div>
 
-			<!-- Display this section if the upload was successful when the file is being converted -->
+<!-- Display this section if the upload was successful when the file is being converted -->
 			<div class="convert">
 				<span class="fa" data-ng-class="{spinner: modal.convert.spinner, 'fa-check-circle green': modal.convert.success, 'fa-times-circle red': modal.convert.error}"></span>
 				<p class="text" data-ng-show="modal.convert.text">Preparing sermon audio for web-site</p>
 				<div data-ng-show="modal.convert.progress" data-tc-progress-bar="modal.convert.percent"></div>
-<!--
-				<div class="progress" data-ng-show="modal.convert.progress">
-					<div class="bar" style="width: {{modal.convert.percent}}%;"></div>
-					<div class="percent">{{modal.convert.percent}}%</div>
-				</div>
--->
 			</div>
 
-			<!-- Display this section if the speaker's name is not already in the database -->
+<!-- Display this section if the speaker's name is not already in the database -->
 			<div class="newSpeaker">
 				<span class="fa" data-ng-class="{spinner: modal.newSpeaker.spinner, 'fa-check-circle green': modal.newSpeaker.success, 'fa-times-circle red': modal.newSpeaker.error}"></span>
 				<p class="text" data-ng-show="modal.newSpeaker.text">Adding speaker to list</p>
 			</div>
 
-			<!-- Display this section when the information is being added to the website database -->
+<!-- Display this section when the information is being added to the website database -->
 			<div class="remote">
 				<span class="fa" data-ng-class="{spinner: modal.remote.spinner, 'fa-check-circle green': modal.remote.success, 'fa-times-circle red': modal.remote.error}"></span>
 				<p class="text" data-ng-show="modal.remote.text">Sending information to web-site</p>
 			</div>
 
-			<!-- Display this section when the information is being added to the church onsite database -->
+<!-- Display this section when the information is being added to the church onsite database -->
 			<div class="local">
 				<span class="fa" data-ng-class="{spinner: modal.local.spinner, 'fa-check-circle green': modal.local.success, 'fa-times-circle red': modal.local.error}"></span>
 				<p class="text" data-ng-show="modal.local.text">Sending sermon information to Church server</p>
 			</div>
 
-		</div> <!-- End Modal Div -->
+			<div class="complete">
+				<span class="fa" data-ng-class="{spinner: modal.local.spinner, 'fa-check-circle green': modal.local.success, 'fa-times-circle red': modal.local.error}"></span>
+				<p class="text" data-ng-show="modal.local.text">The sermon has successfully been submitted.</p>
+			</div>
+
+		</div>
 
 	</body>
 </html>

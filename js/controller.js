@@ -3,6 +3,7 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 //--------------------------------------------------------------------------------
 //	Init Variables
 //--------------------------------------------------------------------------------
+	var remoteOnly = true;
 	var apiRoot = "/php/api/";
 	if ($location.host() == "localhost") {
 		apiRoot = "/sermonUpload" + apiRoot;
@@ -44,7 +45,8 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 	$scope.name = "";
 	$scope.sermonTitle = "";
 	$scope.specialInfo = "";
-
+	$scope.fileName = null;
+	$scope.databaseInfo = {};
 	$scope.dateOptions = {
 		changeYear: true,
 		changeMonth: true,
@@ -53,6 +55,8 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 
 	$scope.modal = {
 		visible: false,
+		complete: false,
+		error: false,
 		info: {
 			error: false,
 			name: false,
@@ -60,22 +64,21 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 			file: false,
 			fileSize: false,
 		},
-		error: false,
 		upload: {
-			progress: false,
-			percent: 0,
 			spinner: false,
 			success: false,
 			error: false,
 			text: false,
+			progress: false,
+			percent: 0,
 		},
 		convert: {
-			progress: false,
-			percent: 0,
 			spinner: false,
 			success: false,
 			error: false,
 			text: false,
+			progress: false,
+			percent: 0,
 			timer: null,
 		},
 		newSpeaker: {
@@ -107,26 +110,22 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 		end = parseInt(end);
 		if (array.length > 0) {
 			if (array[0] < start) {
-				console.log("1");
 				for (var i = array[0]; i < start; i = array[0]) {
 					array.shift();
 				}
 			}
 			if (array[0] > start) {
-				console.log("2");
 				for (var i = array[0] - 1; i >= start; i--) {
 					array.unshift(i);
 				}
 			}
 			if (end) {
 				if (array[array.length - 1] > end) {
-					console.log("3");
 					for (var i = array[array.length - 1]; i > end; i = array[array.length - 1]) {
 						array.pop();
 					}
 				}
 				if (array[array.length - 1] < end) {
-					console.log("4");
 					for (var i = array[array.length - 1] + 1; i <= end; i++) {
 						array.push(i);
 					}
@@ -141,48 +140,66 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 	}
 
 	var submitToLocalDatabase = function() {
-		
+		$scope.modal.local.text = true;
+		$scope.modal.local.spinner = true;
+		$http({method: "GET", url: apiRoot + "local.php", params: $scope.databaseInfo}).success(function(response) {
+			$scope.modal.local.spinner = false;
+			if (!response.error && response.result == "00000") {
+				$scope.modal.local.success = true;
+				$scope.modal.complete = true;
+			} else {
+				$scope.modal.local.error = true;
+				console.log("Result: ", response.result);
+				console.log("Error: ", response.error);
+			}
+		}).error(function(error) {
+			$scope.modal.local.spinner = false;
+			$scope.modal.local.error = true;
+			console.log("Error: ", error);
+		});
 	}
 
 	var submitToRemoteDatabase = function() {
-		var sermon = {
+		$scope.modal.remote.text = true;
+		$scope.modal.remote.spinner = true;
+
+		$scope.databaseInfo = {
 			method: "addSermon",
 			date: $filter("date")($scope.date, "yyyy-MM-dd"),
+			day: $filter("date")($scope.date, "EEE"),
 			service: $scope.service.value,
 			speaker: $scope.speaker.speaker_id,
-			sermon_title: $scope.title,
+			sermon_title: $scope.sermonTitle,
 			book: $scope.bible.book.bnum,
 			start_chap: $scope.bible.startChap,
 			start_verse: $scope.bible.startVerse,
 			end_chap: $scope.bible.endChap,
 			end_verse: $scope.bible.endVerse,
 			sermon_type: $scope.type.type_id,
-			special_info: $scope.special_info,
+			special_info: $scope.specialInfo,
 			remote_filename: $scope.sermonInfo.new_name,
 			local_filename: $scope.sermonInfo.old_name,
-		}
-		// This app is meant to be run from an intranet when in production
-		// If localOnly is set to "true" this will only update the
-		// local database (the database the server is running on
-		// if set to "false" it will also update a database setup as the remote database
-		if (localOnly) {
-			submitToLocalDatabase();
-		} else {
-			$http({method: "GET", url: apiRoot + "remote.php"}).success(function(response) {
-				if (!response.error) {
-					$scope.modal.remote.success = true;
-					submitToLocalDatabase();
+		};
+		$http({method: "GET", url: apiRoot + "remote.php", params: $scope.databaseInfo}).success(function(response) {
+			$scope.modal.remote.spinner = false;
+			if (!response.error && response.result == "00000") {
+				$scope.modal.remote.success = true;
+				if (remoteOnly) {
+					$scope.modal.complete = true;
 				} else {
-					$scope.modal.remote.error = true;
-					console.log("Error: ", response.error);
+					submitToLocalDatabase();
 				}
-			}).error(function(error) {
+			} else {
 				$scope.modal.remote.error = true;
-				console.log("Error: ", error);
-			}).always(function() {
-				$scope.modal.remote.spinner = false;
-			});
-		}
+				console.log(response);
+				console.log("Result: ", response.result);
+				console.log("Error: ", response.error);
+			}
+		}).error(function(error) {
+			$scope.modal.remote.spinner = false;
+			$scope.modal.remote.error = true;
+			console.log("Error: ", error);
+		});
 	}
 
 	var checkForNewSpeaker = function() {
@@ -194,24 +211,26 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 			$scope.modal.newSpeaker.spinner = true;
 			var speaker = {
 				method: "saveNewSpeaker",
-				title: $scope.speakerTitle.value,
+				title_id: $scope.speakerTitle,
 				name: $scope.name,
 			};
-			$http({method: "GET", url: apiRoot + "newSpeaker.php", params: speaker}).success(function(resonse) {
-				if (!response.error) {
+			$http({method: "GET", url: apiRoot + "speakers.php", params: speaker}).success(function(response) {
+				$scope.modal.newSpeaker.spinner = false;
+				if (!response.error && response.speaker_id) {
 					$scope.modal.newSpeaker.success = true;
 					// Save the id to the speaker and send the sermon info the remote database
-					$scope.speaker.speaker_id = response.speaker_id;
+					$scope.speaker = {
+						speaker_id: response.speaker_id,
+					}
 					submitToRemoteDatabase();
 				} else {
 					$scope.modal.newSpeaker.error = true;
 					console.log("Error: ", response.error);
 				}
 			}).error(function(error) {
+				$scope.modal.newSpeaker.spinner = false;
 				$scope.modal.newSpeaker.error = true;
 				console.log("Error: ", error);
-			}).always(function() {
-				$scope.modal.newSpeaker.spinner = false;
 			});
 		}
 	}
@@ -222,8 +241,7 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 		$scope.modal.convert.progress = true;
 
 		$http({method: "GET", url: apiRoot + "init.php"}).success(function(response) {
-			var id = response.id
-
+			options.id = response.id;
 			$scope.modal.convert.timer = $interval(function() {
 				$http({method: "GET", url: apiRoot + "percent.php", params: response}).success(function(response) {
 					$scope.modal.convert.percent = parseInt(response.number);
@@ -234,7 +252,6 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 				});
 			}, 50);
 
-			options.id = id;
 			$http({method: "GET", url: apiRoot + "lame.php", params: options}).success(function(response) {
 				$interval.cancel($scope.modal.convert.timer);
 				$scope.modal.convert.spinner = false;
@@ -243,16 +260,15 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 					$scope.modal.convert.success = true;
 					checkForNewSpeaker();
 				} else {
-					console.log(response.status);
 					$scope.modal.convert.spinner = false;
 					$scope.modal.convert.error = true;
 				}
+				$http({method: "GET", url: apiRoot + "percent.php", params: {remove_id: options.id}});
 			}).error(function(error) {
 				$interval.cancel($scope.modal.convert.timer);
 				$scope.modal.convert.spinner = false;
 				$scope.modal.convert.error = true;
 				console.log("Error: ", error);
-			}).always(function() {
 				$http({method: "GET", url: apiRoot + "percent.php", params: {remove_id: id}});
 			});
 		}).error(function(error) {
@@ -353,7 +369,6 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 			} else if ($scope.bible.endChap > $scope.bible.startChap) {
 				arrayFill($scope.bible.endVerses, 1, response.endVerseNum);
 			}
-			console.log(response.endVerseNum);
 			$scope.bible.endVerse = parseInt(response.endVerseNum);
 			$scope.bible.text = response.verseText;
 		}).error(function(error) {
@@ -449,7 +464,7 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 			$scope.modal.info.error = true;
 			$scope.modal.info.name = true;
 		} else {
-			if ($scope.name != $scope.speaker.value) {
+			if (!$scope.speaker || !$scope.speaker.value || $scope.name != $scope.speaker.value) {
 				var speaker = $filter("filter")($scope.speakers, {value: $scope.name});
 				if (speaker.length == 1) {
 					$scope.speaker = $scope.speakers[$scope.speakers.indexOf(speaker[0])];
@@ -478,7 +493,7 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 			$scope.sermonInfo = {
 				name: tempName + ".tmp",
 				new_name: tempName + ".mp3",
-				old_name: "",
+				old_name: $scope.fileName,
 			};
 			$('form').ajaxSubmit({
 				url: "php/api/upload.php",
@@ -502,7 +517,6 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 					$scope.modal.upload.percent = 100;
 					$scope.$apply();
 					$scope.sermonInfo.upload_dir = response[0].upload_dir;
-					console.log($scope.sermonInfo);
 					convertAudioFile($scope.sermonInfo, checkForNewSpeaker);
 				},
 				error: function(error) {
@@ -526,5 +540,4 @@ app.controller("Form", function($scope, $filter, $http, $interval, $location) {
 	$scope.$watch("date", function(date) {
 		$scope.textDate = $filter("date")($scope.date, "yyyy-MM-dd");
 	});
-
 });

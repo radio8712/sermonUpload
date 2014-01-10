@@ -2,6 +2,7 @@
 ini_set('display_errors', '1');
 require_once("db_conn.php");
 
+// create a class to manage MySQL queries for Speakers
 class Speaker {
 
 	protected $db;
@@ -14,7 +15,7 @@ class Speaker {
 	function add_new_speaker($title_id, $name) {
 		$query = $this->db->prepare("INSERT INTO speakers (title_id, speaker) VALUES (:title_id, :name)");
 		$query->execute(array(":title_id" => $title_id, ":name" => $name));
-		return $query->errorCode();
+		return $this->db->lastInsertId();
 	}
 
 	function get_speakers() {

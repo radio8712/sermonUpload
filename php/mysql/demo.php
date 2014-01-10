@@ -2,6 +2,7 @@
 ini_set('display_errors', '1');
 $require_once("db_conn.php");
 
+// example template class
 class MyNewClass {
 
 	protected $db;

@@ -1,6 +1,6 @@
 <?php
 /*
-This pages is referenced from javascript and ajax
+This page is referenced from javascript and ajax
 It provides Bible book, chapter, and verse information
 	for the main page
 */
@@ -9,10 +9,11 @@ require_once "../mysql/Bible.php";
 $bible = new Bible($localdb);
 
 
-// Get the information from the Ajax
+// Get the information from the Ajax request
 if ($_POST) extract($_POST);
 else if ($_GET) extract($_GET);
 
+// Send the initial information
 if ($method == "init") {
 	$bookList	= $bible->get_books();
 	$chapNum	= $bible->get_chapters_by_book($bookList[0]['bnum']);
@@ -27,7 +28,7 @@ if ($method == "init") {
 	echo json_encode($output);
 }
 
-// Check for what was passed
+// If the book was changed
 if ($method == 'bookChange') {
 	$chapNum = $bible->get_chapters_by_book($book);
 	$verseNum = $bible->get_verses_by_chapter($book, 1);
@@ -40,6 +41,7 @@ if ($method == 'bookChange') {
 	echo json_encode($output);
 }
 
+// If the chapter changed
 if ($method == 'chapterChange')
 {
 	$startVerseNum = $bible->get_verses_by_chapter($book, $startChapter);
@@ -52,6 +54,8 @@ if ($method == 'chapterChange')
 	);
 	echo json_encode($output);
 }
+
+// If the verse changed
 if ($method == 'verseChange')
 {
 	$verseText = $bible->get_verse_text($book, $startVerse, $startChapter, $endVerse, $endChapter);

@@ -1,7 +1,10 @@
-<?php error_reporting(E_ALL);
+<?php 
+
+error_reporting(E_ALL);
 ini_set('display_errors', '1');
 require_once("db_conn.php");
 
+// create a class to manage MySQL queries for Sermons
 class Sermon {
 
 	protected $db;
@@ -11,11 +14,12 @@ class Sermon {
 			$this->db = $database;
 	}
 
-	function add_sermon($date, $service, $speaker, $sermon_title, $book, $start_chap, $start_verse, $end_chap, $end_verse, $sermon_type, $special_info, $filename) {
+	function add_sermon($date, $day, $service, $speaker, $sermon_title, $book, $start_chap, $start_verse, $end_chap, $end_verse, $sermon_type, $special_info, $filename) {
 		$query = $this->db->prepare("INSERT INTO archives
-( date,  service,  speaker,  sermon_title,  book,  start_chap,  start_verse,  end_chap,  end_verse,  sermon_type,  special_info,  filename) VALUES
-(:date, :service, :speaker, :sermon_title, :book, :start_chap, :start_verse, :end_chap, :end_verse, :sermon_type, :special_info, :filename)");
+( date,  day,  service,  speaker,  sermon_title,  book,  start_chap,  start_verse,  end_chap,  end_verse,  sermon_type,  spec_info,  filename) VALUES
+(:date, :day, :service, :speaker, :sermon_title, :book, :start_chap, :start_verse, :end_chap, :end_verse, :sermon_type, :special_info, :filename)");
 		$query->execute(array(":date"					=> $date,
+													":day"					=> $day,
 													":service"			=> $service,
 													":speaker"			=> $speaker,
 													":sermon_title"	=> $sermon_title,
@@ -27,7 +31,7 @@ class Sermon {
 													":sermon_type"	=> $sermon_type,
 													":special_info"	=> $special_info,
 													":filename"			=> $filename));
-		return $this->db->lastInsertId();
+		return $query->errorCode();
 	}
 
 	function get_sermons() {

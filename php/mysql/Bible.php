@@ -2,6 +2,7 @@
 ini_set('display_errors', '1');
 require_once("db_conn.php");
 
+// Create a class to handle MySQL access to the Bible database
 class Bible {
 
 	protected $db;

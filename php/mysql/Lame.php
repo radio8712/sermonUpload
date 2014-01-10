@@ -2,6 +2,8 @@
 ini_set('display_errors', '1');
 require_once("db_conn.php");
 
+// create a class to manage MySQL queries for the file conversion process
+// This class allows the file conversion progress bar to update
 class Lame {
 
 	protected $localdb;
@@ -16,8 +18,6 @@ class Lame {
 	function init() {
 	$query = $this->localdb->prepare('INSERT INTO percent VALUES (NULL, 0)');
 	$query->execute();
-
-//	$query = $this->localdb->prepare('INSERT INTO customer VALUES (NULL, :name, :email, NULL, :password, :dob, NULL, NULL, :subscription) ON DUPLICATE KEY UPDATE name=:name, email=:email, password=:password, birthdate=:dob, subscription=:subscription');
 		return $this->localdb->lastInsertId();
 	}
 	function set_percent($id, $percent) {

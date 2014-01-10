@@ -14,9 +14,14 @@ if (!$myDb){
 if ($_POST) extract($_POST);
 else if ($_GET) extract($_GET);
 
+// Make sure variable exists
+if (!isset($special_info)) {
+	$special_info = "";
+}
+
 // Check to see if a new speaker needs saved
 if ($method == "addSermon") {
-	$sermon_r = $myDb->add_sermon($date, $service, $speaker, $sermon_title, $book, $start_chap, $start_verse, $end_chap, $end_verse, $sermon_type, $special_info, $filename);
+	$sermon_r = $myDb->add_sermon($date, $day, $service, $speaker, $sermon_title, $book, $start_chap, $start_verse, $end_chap, $end_verse, $sermon_type, $special_info, $local_filename);
 
 	// error if the save was unsuccessful
 	if (!$sermon_r){
@@ -25,7 +30,7 @@ if ($method == "addSermon") {
 	}
 	
 	// JSON encode the insert ID and send it to the caller
-	echo json_encode(array("result" => $sermon_r);
+	echo json_encode(array("result" => $sermon_r));
 }
 
 ?>
