@@ -239,6 +239,9 @@ button:not(.ui-button) {
 *	Sermon Viewer Styles
 ****************************************/
 
+.clear {
+	clear: both;
+}
 .viewer {
 	background: white;
 	margin: 50px auto 0 auto;
@@ -247,4 +250,46 @@ button:not(.ui-button) {
 	h1 {
 		text-align: center;
 	}
+	.sermon {
+		position:relative;
+		width: 358px;
+/* 		height: 200px; */
+		float:left;
+		border: 1px solid gray;
+		font-size: 18px;
+		background: @background;
+		border-radius: 20px;
+		margin: 10px 10px 10px 20px;
+		padding: 5px;
+		&:nth-child(3n) {
+			margin: 10px 20px 10px 10px;
+		}
+		.date {
+			font-size: 22px;
+			margin: 0;
+			text-align: center;
+			font-weight: bold;
+		}
+		.box {
+			margin: 1px;
+			padding: 0;
+			.bold {
+				font-weight: bold;
+			}
+		}
+		.button {
+			margin: 10px 5px 5px 5px;
+			padding: 0;
+			button {
+				background: white;
+				display: block;
+				margin: 0 auto;
+				&:hover {
+					background: @background-hover;
+					color: @color-hover;
+				}
+			}
+		}
+	}
+
 }

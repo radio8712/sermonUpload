@@ -35,10 +35,11 @@ class Sermon {
 	}
 
 	function get_sermons() {
-		$query = $this->db->prepare("SELECT archives.`date`, `day`, `service`, titles.`title`, speakers.`speaker`, `sermon_title`, `book`, `start_chap`, `start_verse`, `end_chap`, `end_verse`, types.`sermon_type`, `spec_info`, `filename`
+		$query = $this->db->prepare("SELECT archives.`date`, `day`, `service`, titles.`title`, speakers.`speaker`, `sermon_title`, book_chap.`book`, `start_chap`, `start_verse`, `end_chap`, `end_verse`, types.`sermon_type`, `spec_info`, `filename`
 FROM archives LEFT JOIN speakers ON archives.`speaker` = speakers.`speaker_id` 
 LEFT JOIN titles ON speakers.`title_id` = titles.`id`
-LEFT JOIN types ON archives.`sermon_type` = types.`type_id`");
+LEFT JOIN types ON archives.`sermon_type` = types.`type_id`
+LEFT JOIN book_chap ON archives.`book` = book_chap.`id`");
 		$query->execute();
 		return $query->fetchAll(PDO::FETCH_ASSOC);
 	}

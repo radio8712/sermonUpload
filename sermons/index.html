@@ -5,27 +5,38 @@
 
 		<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
 <!-- Stylesheets -->
-		<link type="text/css" rel="stylesheet"			href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
-		<link type="text/css" rel="stylesheet"			href="../css/flick/jquery-ui.css" />
-		<link type="text/css" rel="stylesheet/less" href="../css/main.less" />
-<!-- 		<link type="text/css" rel="stylesheet" href="../css/main.css" /> -->
+<!-- Dynamic Stylesheet link -->
+<!-- 		<link type="text/css" rel="stylesheet/less" href="../css/main.less" /> -->
+		<link type="text/css" rel="stylesheet" href="../css/main.css" />
 
 <!-- Scripts -->
+<!-- Dynamic Stylesheet script -->
+<!-- 		<script type="text/javascript" src="../js/plugins/less/less.js"></script> -->
 		<script type="text/javascript" src="../js/plugins/jquery/jquery.js"></script>
-		<script type="text/javascript" src="../js/plugins/jquery/jquery-ui.js"></script>
-		<script type="text/javascript" src="../js/plugins/less/less.js"></script>
 		<script type="text/javascript" src="../js/plugins/angular/angular.js"></script>
-		<script type="text/javascript" src="../js/plugins/angular/angular-sanitize.js"></script>
-		<script type="text/javascript" src="../js/plugins/angular/date.js"></script>
-<!-- 		<script type="text/javascript" src="../js/main.js"></script> -->
 		<script type="text/javascript" src="../js/sermons.js"></script>
-		<script type="text/javascript" src="../js/service.js"></script>
-		<script type="text/javascript" src="../js/directive.js"></script>
 	</head>
 
 	<body ng-controller="Sermons">
 	<div class="viewer">
-		<pre>{{sermons | json}}</pre>
+		<h1>Uploaded Sermons</h1>
+		<div class="sermon" data-ng-repeat-start="sermon in sermons">
+			<p class="date">{{sermon.date | date:"EEEE - MMM d, yyyy"}}</p>
+			<p class="box">
+				<span class="bold speaker">{{sermon.title}} {{sermon.speaker}}</span> - <span class="text">{{sermon.text}}</span>
+			</p>
+			<p class="box">
+				<span class="bold">Title:</span>
+				<span class="title">{{sermon.sermon_title}}</span>
+			</p>
+			<p class="box" data-ng-show="sermon.spec_info != ''">
+				<span class="bold">Special Info:</span>
+				<span class="info">{{sermon.spec_info}}</span>
+			</p>
+			<p class="button"><button data-ng-click="downloadSermon(sermon)">Download the Sermon</button></p>
+		</div>
+		<div class="clear" data-ng-if="$odd" data-ng-repeat-end></div>
+<!-- 		<pre>{{sermons | json}}</pre> -->
 	</div>
 	</body>
 </html>

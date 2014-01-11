@@ -12,22 +12,40 @@ body {
 .clear.extra {
   margin: 12px 0 5px 0;
 }
-.form {
+.container {
   background: white;
   margin: 50px auto 0 auto;
-  width: 700px;
+  width: 800px;
+  height: 500px;
 }
-.form label {
-  width: 150px;
+.container h1 {
+  text-align: center;
+}
+.container .bible {
+  float: left;
+  width: 250px;
+  height: 440px;
+  overflow: scroll;
+}
+.container .bible p {
+  margin: 10px 0;
+}
+.container .form {
+  float: left;
+  width: 530px;
+  margin: 0 0 0 20px;
+}
+.container .form label {
+  width: 120px;
   height: 25px;
   line-height: 25px;
   font-size: 20px;
   display: inline-block;
 }
-.form input[type="text"] {
+.container .form input[type="text"] {
   position: relative;
   top: -1px;
-  width: 530px;
+  width: 390px;
   height: 25px;
   line-height: 25px;
   font-size: 15px;
@@ -35,66 +53,69 @@ body {
   border-radius: 5px;
   border: solid 1px #cccccc;
 }
-.form input:focus {
+.container .form input:focus {
   outline: none;
   background: #f4f5f7;
 }
-.form input.short {
-  width: 372px;
+.container .form input.short {
+  width: 282px;
 }
-.form input[type='file'] {
+.container .form input[type='file'] {
   display: none;
 }
-.form .select {
+.select {
   position: relative;
   top: 7px;
   display: inline-block;
-  width: 540px;
+  width: 400px;
   height: 25px;
   line-height: 25px;
+  overflow: hidden;
   border-radius: 5px;
   border: solid 1px #cccccc;
 }
-.form .select .fa {
+.select .fa {
   float: right;
   color: #aaa;
   margin: -25px 2px 2px 0;
   line-height: 25px;
+  font-size: 20px;
 }
-.form .select select {
-  width: 540px;
+.select select {
+  position: relative;
+  width: 400px;
   height: 25px;
   line-height: 25px;
   padding: 0 5px;
   font-size: 15px;
-  /* 			font-size: 16px; */
-  background: transparent;
   outline: none;
-  border: 0;
+  border: none;
   border-radius: 0;
+  background: transparent;
   appearance: none;
-  -moz-appearance: none;
+  -moz-appearance: radio-container;
   -webkit-appearance: none;
+  cursor: pointer;
 }
-.form .select.short {
-  width: 152px;
+.select.short {
+  width: 102px;
 }
-.form .select.short select {
-  width: 152px;
+.select.short select {
+  width: 102px;
 }
-.form .select.book {
-  width: 230px;
+.select.book {
+  width: 150px;
 }
-.form .select.book select {
-  width: 230px;
+.select.book select {
+  width: 150px;
 }
-.form .select.number {
+.select.number {
+  width: 50px;
+}
+.select.number select {
   width: 65px;
 }
-.form .select.number select {
-  width: 65px;
-}
-.button {
+button:not(.ui-button) {
   height: 30px;
   line-height: 25px;
   font-size: 15px;
@@ -106,39 +127,7 @@ body {
   border: solid 1px #cccccc;
   border-radius: 5px;
 }
-.button:hover {
-  background: #0073ea;
-  color: #f6f6f6;
-}
-button {
-  height: 30px;
-  line-height: 25px;
-  font-size: 15px;
-  margin: 0;
-  padding: 0 15px;
-  outline: none;
-  background: #f6f6f6;
-  color: #0073ea;
-  border: solid 1px #cccccc;
-  border-radius: 5px;
-}
-button:hover {
-  background: #0073ea;
-  color: #f6f6f6;
-}
-input[type="submit"] {
-  height: 30px;
-  line-height: 25px;
-  font-size: 15px;
-  margin: 0;
-  padding: 0 15px;
-  outline: none;
-  background: #f6f6f6;
-  color: #0073ea;
-  border: solid 1px #cccccc;
-  border-radius: 5px;
-}
-input[type="submit"]:hover {
+button:not(.ui-button):hover {
   background: #0073ea;
   color: #f6f6f6;
 }
@@ -159,7 +148,7 @@ input[type="submit"]:hover {
 ****************************************/
 .spinner {
   content: '';
-  position: absolute;
+  position: relative;
   margin: 6px 0 0 8px;
   width: 18px;
   height: 18px;
@@ -185,3 +174,84 @@ input[type="submit"]:hover {
 /****************************************
 *	Modal
 ****************************************/
+.modal p.text {
+  display: inline-block;
+}
+.modal .moreInfo .fa {
+  font-size: 15px;
+}
+.modal .progress {
+  position: relative;
+  width: 400px;
+  border: 1px solid #ddd;
+  padding: 1px;
+  border-radius: 3px;
+}
+.modal .bar {
+  background-color: #B4F5B4;
+  width: 0%;
+  height: 20px;
+  border-radius: 3px;
+}
+.modal .percent {
+  position: absolute;
+  display: inline-block;
+  top: 3px;
+  left: 48%;
+}
+/****************************************
+*	Sermon Viewer Styles
+****************************************/
+.clear {
+  clear: both;
+}
+.viewer {
+  background: white;
+  margin: 50px auto 0 auto;
+  width: 800px;
+  height: 500px;
+}
+.viewer h1 {
+  text-align: center;
+}
+.viewer .sermon {
+  position: relative;
+  width: 358px;
+  /* 		height: 200px; */
+  float: left;
+  border: 1px solid gray;
+  font-size: 18px;
+  background: #f6f6f6;
+  border-radius: 20px;
+  margin: 10px 10px 10px 20px;
+  padding: 5px;
+}
+.viewer .sermon:nth-child(3n) {
+  margin: 10px 20px 10px 10px;
+}
+.viewer .sermon .date {
+  font-size: 22px;
+  margin: 0;
+  text-align: center;
+  font-weight: bold;
+}
+.viewer .sermon .box {
+  margin: 1px;
+  padding: 0;
+}
+.viewer .sermon .box .bold {
+  font-weight: bold;
+}
+.viewer .sermon .button {
+  margin: 10px 5px 5px 5px;
+  padding: 0;
+}
+.viewer .sermon .button button {
+  background: white;
+  display: block;
+  margin: 0 auto;
+}
+.viewer .sermon .button button:hover {
+  background: #0073ea;
+  color: #f6f6f6;
+}
