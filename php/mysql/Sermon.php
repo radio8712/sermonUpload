@@ -39,7 +39,8 @@ class Sermon {
 FROM archives LEFT JOIN speakers ON archives.`speaker` = speakers.`speaker_id` 
 LEFT JOIN titles ON speakers.`title_id` = titles.`id`
 LEFT JOIN types ON archives.`sermon_type` = types.`type_id`
-LEFT JOIN book_chap ON archives.`book` = book_chap.`id`");
+LEFT JOIN book_chap ON archives.`book` = book_chap.`id`
+order by archives.`date` desc");
 		$query->execute();
 		return $query->fetchAll(PDO::FETCH_ASSOC);
 	}
