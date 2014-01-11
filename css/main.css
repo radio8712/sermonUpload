@@ -83,7 +83,7 @@ body {
 }
 .select select {
   position: relative;
-  width: 400px;
+  width: 425px;
   height: 25px;
   line-height: 25px;
   padding: 0 5px;
@@ -101,19 +101,19 @@ body {
   width: 102px;
 }
 .select.short select {
-  width: 102px;
+  width: 127px;
 }
 .select.book {
   width: 150px;
 }
 .select.book select {
-  width: 150px;
+  width: 180px;
 }
 .select.number {
   width: 50px;
 }
 .select.number select {
-  width: 65px;
+  width: 75px;
 }
 button:not(.ui-button) {
   height: 30px;

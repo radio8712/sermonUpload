@@ -1,6 +1,7 @@
 .select select {
   width: 500px;
 }
+input {width: 20px;}
 .select.short select {
   width: 122px;
 }
