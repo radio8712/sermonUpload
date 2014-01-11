@@ -1,5 +1,12 @@
 <?php
 
+/**************************************************
+*	Thom Williams
+*	201102W0001
+*	CET-482
+*	Senior Project - Sermon Uploader
+**************************************************/
+
 // Template file for database connections
 // This file make prevents the db_conn.php file from
 //  being in the GitHub repository

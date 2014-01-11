@@ -1,5 +1,12 @@
 <?php
 
+/**************************************************
+*	Thom Williams
+*	201102W0001
+*	CET-482
+*	Senior Project - Sermon Uploader
+**************************************************/
+
 // Send the sermon types to the caller
 
 require_once "../mysql/Speakers.php";

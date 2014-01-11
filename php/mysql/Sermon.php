@@ -1,5 +1,12 @@
 <?php 
 
+/**************************************************
+*	Thom Williams
+*	201102W0001
+*	CET-482
+*	Senior Project - Sermon Uploader
+**************************************************/
+
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 require_once("db_conn.php");

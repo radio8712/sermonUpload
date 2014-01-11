@@ -1,4 +1,12 @@
 <?php
+
+/**************************************************
+*	Thom Williams
+*	201102W0001
+*	CET-482
+*	Senior Project - Sermon Uploader
+**************************************************/
+
 // Handle file uploads
 
 @$xhr = $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';

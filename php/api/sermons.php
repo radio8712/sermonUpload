@@ -1,5 +1,12 @@
 <?php
 
+/**************************************************
+*	Thom Williams
+*	201102W0001
+*	CET-482
+*	Senior Project - Sermon Uploader
+**************************************************/
+
 require_once("../mysql/Sermon.php");
 $myDb = new Sermon($localdb);
 $sermons = $myDb->get_sermons();

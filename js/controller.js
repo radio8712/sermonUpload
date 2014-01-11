@@ -1,3 +1,10 @@
+/**************************************************
+*	Thom Williams
+*	201102W0001
+*	CET-482
+*	Senior Project - Sermon Uploader
+**************************************************/
+
 // initialize the angular app for the sermon uploader
 var app = angular.module("SermonUploader", ["ui.date","ngSanitize"]);
 

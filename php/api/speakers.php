@@ -1,4 +1,12 @@
 <?php
+
+/**************************************************
+*	Thom Williams
+*	201102W0001
+*	CET-482
+*	Senior Project - Sermon Uploader
+**************************************************/
+
 // Get the files to make a database connection
 require_once("../mysql/Speakers.php");
 

@@ -1,4 +1,12 @@
 <?php
+
+/**************************************************
+*	Thom Williams
+*	201102W0001
+*	CET-482
+*	Senior Project - Sermon Uploader
+**************************************************/
+
 // Import the MySQL library this file uses
 require_once("../mysql/Lame.php");
 
