@@ -1,12 +1,12 @@
 .select select {
-  width: 400px;
+  width: 420px;
 }
 .select.short select {
-  width: 102px;
+  width: 122px;
 }
 .select.book select {
-  width: 150px;
+  width: 170px;
 }
 .select.number select {
-  width: 65px;
+  width: 85px;
 }
