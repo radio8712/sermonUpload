@@ -13,7 +13,7 @@ app.controller("Sermons", function($scope, $filter, $http, $location) {
 	$scope.sermons = [];
 	
 	$scope.downloadSermon = function(sermon) {
-		window.location = webRoot + "/download.php?file=" + sermon.filename;
+		window.location = "/download.php?file=" + sermon.filename;
 	}
 
 	$http.get(apiRoot + "sermons.php").success(function(response) {
